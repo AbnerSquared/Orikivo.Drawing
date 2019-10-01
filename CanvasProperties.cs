@@ -2,8 +2,10 @@
 {
     public class CanvasProperties
     {
-        public int Width; // if empty, is automatically set based on the action.
-        public int Height; //
-        public Padding Padding;
+        // determines if the row's padding underneath is stretched to contain the offset.
+        public bool ExtendOnOffset { get; set; }
+        public int Width { get; set; } // if empty, is automatically set based on the action.
+        public int Height { get; set; }
+        public Padding Padding { get; set; }
     }
 }

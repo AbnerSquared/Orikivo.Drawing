@@ -1,18 +1,21 @@
-﻿namespace Orikivo.Poxel
+﻿using System.Drawing;
+
+namespace Orikivo.Poxel
 {
     // a sprite that was cropped automatically using the size of the image and position.
     public class CroppedSprite
     {
-        public CroppedSprite(string sheetUrl, int x, int y, int width, int height)
+        internal CroppedSprite(string sheetUrl, int x, int y, int width, int height)
         {
-            SheetUrl = sheetUrl;
+            ParentUrl = sheetUrl;
 
         }
 
-        public string SheetUrl; // a image path holding a ton of images
-        public int X { get; }
-        public int Y { get; }
+        public string ParentUrl; // a image path holding a ton of images
+
+        public Bitmap Source => Poxel.Crop(ParentUrl, Width, Height, Pos);
         public int Width { get; }
         public int Height { get; }
+        public CropPoint Pos { get; } // the position of where it was cropped.
     }
 }

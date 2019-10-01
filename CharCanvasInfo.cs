@@ -2,20 +2,22 @@
 
 namespace Orikivo.Poxel
 {
-    public class CharCanvasInfo
+    /// <summary>
+    /// Contains all of the required information for rendering a character within a StringCanvas.
+    /// </summary>
+    public struct CharCanvasInfo
     {
-        internal CharCanvasInfo(Bitmap sprite, char c, Point p, Size s, Offset offset = null)
+        // can only be built inside Poxel.
+        internal CharCanvasInfo(Bitmap sprite, char c, Point p, Size s, Offset? offset = null)
         {
             Sprite = sprite;
             Char = c;
-            if (c == '\n')
-                IsNewline = true;
+            IsNewline = c == '\n';
             Pos = p;
             Size = s;
             Offset = offset ?? Offset.Empty;
-
         }
-        public bool IsNewline { get; } = false;
+        public bool IsNewline { get; }
         // if specified, shows the sprite to display.
         public Bitmap Sprite { get; }
 

@@ -10,15 +10,19 @@ namespace Orikivo.Poxel
     {
         // make two versions, one with rendered sprites, and one without.
         // store the sprites and length at the same time to reduce redraw time.
-        public StringCanvas(FontFace font, string text, Padding padding = null, int? maxWidth = null, int? maxHeight = null, bool useNonEmptyWidth = false, bool extendOnOffset = false)
+        // make .MaxHeight .MaxWidth .Width .Height
+        // if Width is specified, the canvas will be that width regardless
+        // if .MaxWidth is specified instead, the canvas can expand up to that width.
+        public StringCanvas(string content, FontFace font, Padding? canvasPadding = null, int? maxWidth = null, int? maxHeight = null, bool useNonEmptyWidth = true, bool extendOnOffset = false)
         {
+            Padding padding = canvasPadding ?? Padding.Empty;
             int charHeight = font.Padding.Top + font.Height + font.Padding.Bottom;
-            CharSpriteMap sprites = new CharSpriteMap(font, text, useNonEmptyWidth);
+            CharSpriteMap sprites = new CharSpriteMap(content, font, useNonEmptyWidth);
             CharLengthMap charWidths = (useNonEmptyWidth && !font.IsMonospace) ?
                 new CharLengthMap(sprites.Values.Select(x => (x.c, x.bmp.Width)).ToArray()) : null; // used if the text allows for it
             int defaultCharWidth = font.Padding.Left + font.Width + font.Padding.Right;
             int charWidth = defaultCharWidth;
-            List<char> chars = text.ToList();
+            List<char> chars = content.ToList();
             int yOffset = 0;
             Pointer cur = new Pointer(maxWidth: maxWidth, maxHeight: maxHeight);
             List<CharCanvasInfo> pointInfo = new List<CharCanvasInfo>();
@@ -28,29 +32,27 @@ namespace Orikivo.Poxel
                 // handle newline
                 if (c == '\n')
                 {
-                    pointInfo.Add(new CharCanvasInfo(null, c, new Point((padding?.Left ?? 0) + cur.Pos.X, (padding?.Top ?? 0) + cur.Pos.Y), new Size(0, charHeight))); // CharCanvasInfo.IsNewline, CharCanvasInfo.Sprite, CharCanvasInfo.Pos, CharCanvasInfo.Size
+                    pointInfo.Add(new CharCanvasInfo(null, c, new Point(padding.Left + cur.Pos.X, padding.Top + cur.Pos.Y), new Size(0, charHeight))); // CharCanvasInfo.IsNewline, CharCanvasInfo.Sprite, CharCanvasInfo.Pos, CharCanvasInfo.Size
                     cur.ResetX();
-                    // handle char offsets.
-                    if (!extendOnOffset)
-                        yOffset = 0;
+                    // offsets are now handled in Poxel.DrawString()
+                    // handle total accumulative y offset to determine width.
 
-                    cur.MoveY(charHeight + yOffset);
-                    yOffset = 0;
+                    cur.MoveY(charHeight);
                     continue;
                 }
 
                 // handle empty chars
-                if (font.EmptyChars[c] != null)
+                if (font.Empties[c] != null)
                 {
-                    pointInfo.Add(new CharCanvasInfo(null, c, new Point((padding?.Left ?? 0) + cur.Pos.X, (padding?.Top ?? 0) + cur.Pos.Y), new Size(font.EmptyChars[c].Length, charHeight)));
-                    cur.MoveX(font.EmptyChars[c].Length);
+                    pointInfo.Add(new CharCanvasInfo(null, c, new Point(padding.Left + cur.Pos.X, padding.Top + cur.Pos.Y), new Size(font.Empties[c].Length, charHeight)));
+                    cur.MoveX(font.Empties[c].Length);
                     continue;
                 }
                 else if (CharEmptyInfo.IsEmptyChar(c))
                     throw new Exception("A char is missing a specified empty width.");
 
-                // if there's a y offset that's greater than 0, capture.
-                yOffset = (extendOnOffset && font.Offsets[c] != null) ? Math.Max(font.Offsets[c].Offset.Y, 0) : 0;
+                // if there's a y offset that's greater than 0, capture that.
+                yOffset += Math.Max(font.Offsets[c].Offset.Y, 0);
 
                 int charIndex = chars.IndexOf(c);
 
@@ -61,22 +63,27 @@ namespace Orikivo.Poxel
                     charWidth -= font.Padding.Right;
 
                 pointInfo.Add(new CharCanvasInfo(sprites[c], c,
-                    new Point((padding?.Left ?? 0) + cur.Pos.X, (padding?.Top ?? 0) + cur.Pos.Y),
+                    new Point(padding.Left + cur.Pos.X, padding.Top + cur.Pos.Y),
                     new Size(charWidth, charHeight),
-                    font.Offsets[c]?.Offset));
+                    font.Offsets[c].Offset));
                 // otherwise, the char is simply normal.
                 cur.MoveX(charWidth); // ignore padding set before if the first char, or after if the last char.
             }
 
-            Width = (padding?.Left ?? 0) + cur.Width + (padding?.Right ?? 0);
-            Height = (padding?.Top ?? 0) +  cur.Height + (padding?.Bottom ?? 0);
+            Padding = padding;
+            Width = padding.Left + cur.Width + padding.Right;
+            
+            Height = padding.Top +  cur.Height + padding.Bottom;
+            if (extendOnOffset) // you want to make sure to calculate the offset
+                Height += yOffset; // if extending on offsets, add it to the total height.
             Chars = pointInfo;
         }
 
         public bool Disposed { get; private set; } = false;
 
-        public int Width { get; }
-        public int Height { get; }
+        public Padding Padding { get; }
+        public int Width { get; } // this includes the padding.
+        public int Height { get; } // this includes the padding.
 
         public List<CharCanvasInfo> Chars { get; }
         /*

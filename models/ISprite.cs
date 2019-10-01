@@ -2,6 +2,6 @@
 {
     public interface ISprite
     {
-        string SheetUrl { get; }
+        string Url { get; } // an image reference
     }
 }

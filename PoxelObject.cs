@@ -24,6 +24,13 @@ namespace Orikivo.Poxel
 
         }
 
+        public void UpdateLayer() { } // updates a layer with a new bitmap or such
+
+        public void AddLayer() { } // add a layer to the components.
+
+        // draws all of the layers together and returns a bitmap.
+        public Bitmap Build() { throw new NotImplementedException(); }
+
         public void Dispose()
         {
             _source.Dispose();

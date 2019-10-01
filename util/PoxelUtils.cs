@@ -4,35 +4,47 @@ using System.Linq;
 
 namespace Orikivo.Poxel
 {
-    public enum BitmapRatio
-    {
-        SixteenToNine = 1, // 16:9
-        FourToThree = 2, // 4:3
-        OneToOne = 3, // 1:1
-        TwoToOne = 4, // 2:1
-    }
-
-    public enum EmbedMediaType
-    {
-        Thumbnail = 1,
-        Image = 2
-    }
 
     public static class PoxelUtils
     {
-        public static Size Bounds16_9 = new Size(400, 225);
-        public static Size Bounds4_3 = new Size(400, 300);
-        public static Size Bounds1_1 = new Size(300, 300);
-        public static Size Bounds1_2 = new Size(400, 200);
-        public static Size Bounds2_1 = new Size(150, 300);
+        private static Size Bounds16_9 = new Size(400, 225);
+        private static Size Bounds4_3 = new Size(400, 300);
+        private static Size Bounds1_1 = new Size(300, 300);
+        private static Size Bounds1_2 = new Size(400, 200);
+        private static Size Bounds2_1 = new Size(150, 300);
 
-        public static Size Thumbs16_9 = new Size(80, 45);
-        public static Size Thumbs4_3 = new Size(80, 60);
-        public static Size Thumbs1_1 = new Size(80, 80);
-        public static Size Thumbs1_2 = new Size(80, 40);
-        public static Size Thumbs2_1 = new Size(40, 80);
+        private static Size Thumbs16_9 = new Size(80, 45);
+        private static Size Thumbs4_3 = new Size(80, 60);
+        private static Size Thumbs1_1 = new Size(80, 80);
+        private static Size Thumbs1_2 = new Size(80, 40);
+        private static Size Thumbs2_1 = new Size(40, 80);
 
-        public static (int i, int x, int y) GetCharIndex(char c, char[][][][] charMap)
+        /// <summary>
+        /// Returns the size of the specified ratio and type for a Discord.Embed.
+        /// </summary>
+        /// <param name="ratio"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static Size GetRatioDims(EmbedMediaRatio ratio, EmbedMediaType type)
+        {
+            switch (ratio)
+            {
+                case EmbedMediaRatio.Widescreen:
+                    return type == EmbedMediaType.Thumbnail ? Thumbs16_9 : Bounds16_9;
+                case EmbedMediaRatio.Wide:
+                    return type == EmbedMediaType.Thumbnail ? Thumbs2_1 : Bounds2_1;
+                case EmbedMediaRatio.Rectangle:
+                    return type == EmbedMediaType.Thumbnail ? Thumbs4_3 : Bounds4_3;
+                case EmbedMediaRatio.Square:
+                    return type == EmbedMediaType.Thumbnail ? Thumbs1_1 : Bounds1_1;
+                case EmbedMediaRatio.Tall:
+                    return type == EmbedMediaType.Thumbnail ? Thumbs1_2 : Bounds1_2;
+                default:
+                    throw new Exception("The ratio type specified is not a valid ratio.");
+            }
+        }
+
+        internal static (int i, int x, int y) GetCharIndex(char c, char[][][][] charMap)
         {
             (int i, int x, int y) pos = new ValueTuple<int, int, int>();
             

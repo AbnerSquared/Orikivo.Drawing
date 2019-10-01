@@ -12,7 +12,7 @@ namespace Orikivo.Poxel
 {
     public static class BitmapUtils
     {
-        public static ColorMap[] CreateColorMaps(Color[] fromColors, Color[] toColors)
+        internal static ColorMap[] CreateColorMaps(Color[] fromColors, Color[] toColors)
         {
             if (fromColors == null || toColors == null)
                 throw new Exception("A color array is null.");
@@ -26,7 +26,7 @@ namespace Orikivo.Poxel
             return CreateColorMaps(colors);
         }
 
-        public static ColorMap[] CreateColorMaps(params (Color from, Color to)[] colors)
+        internal static ColorMap[] CreateColorMaps(params (Color from, Color to)[] colors)
         {
             if (!(colors?.Length > 0))
                 throw new Exception("At least one color map value must be specified.");
@@ -45,8 +45,9 @@ namespace Orikivo.Poxel
 
         // remember that a discord image container has a border radius of 3px
         // to prevent pixels from looking wonky, add a minimum padding of 4px
-
-        public static Bitmap Remap(Bitmap bmp, ColorMap[] mapTable)
+        internal static Bitmap Remap(Bitmap bmp, ObjectColorMap from, ObjectColorMap to)
+            => Remap(bmp, CreateColorMaps(from.Values, to.Values));
+        internal static Bitmap Remap(Bitmap bmp, ColorMap[] mapTable)
         {
             using (Bitmap canvas = new Bitmap(bmp.Width, bmp.Height))
             {
@@ -64,7 +65,7 @@ namespace Orikivo.Poxel
 
         // figure out a way to figure out the length outside of .GetPixel()
 
-        public static int GetNonEmptyWidth(Bitmap bmp)
+        internal static int GetNonEmptyWidth(Bitmap bmp)
         {
             // the full length.
             int len = bmp.Width;
@@ -86,6 +87,7 @@ namespace Orikivo.Poxel
             return rows.OrderByDescending(x => x).First();
         }
 
+        // creates a new bitmap from a direct stream.
         public static Bitmap GetHttpImage(string url)
         {
             //string toPath = Directory.CreateDirectory(@".\tmp\").FullName;
@@ -104,10 +106,10 @@ namespace Orikivo.Poxel
             List<(int px, int py)> validPoints = new List<(int px, int py)>();
             for (int y = 0; y < bmp.Height; y++)
             {
-                Console.WriteLine("\n\n-- Peeking at new Y --\n\n");
+                Console.WriteLine($"-- Y:{y} --");
                 for (int x = 0; x < bmp.Width; x++)
                 {
-                    Console.WriteLine("\n\n-- Peeking at new X --\n\n");
+                    Console.WriteLine($"-- X:{x} --");
                     // you want to ignore all empty pixels
                     if (bmp.GetPixel(x, y).A == 0)
                         continue;

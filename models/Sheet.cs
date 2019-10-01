@@ -4,25 +4,25 @@ using System.Drawing;
 
 namespace Orikivo.Poxel
 {
-    public class Sheet
+    public class Sheet : ISprite
     {
         public Sheet(SheetInfo info)
         {
             Url = info.Url;
             Source = new Bitmap(Url);
             Sprites = new List<CroppedSprite>();
-            if (info.CropInfo != null)
+            if (info.Unit != null)
             {
-                if (Source.Width % info.CropInfo.Width != 0 || Source.Height % info.CropInfo.Height != 0)
+                if (Source.Width % info.Unit.Width != 0 || Source.Height % info.Unit.Height != 0)
                     throw new Exception("The crop info in correlation to the Bitmap must be evenly cut.");
                 // make offsets to force it to be even.
-                int xLen = Source.Width / info.CropInfo.Width;
-                int yLen = Source.Height / info.CropInfo.Height;
+                int xLen = Source.Width / info.Unit.Width;
+                int yLen = Source.Height / info.Unit.Height;
                 for (int n = 0; n < yLen; n++)
                 {
                     for (int m = 0; m < xLen; m++)
                     {
-                        Sprites.Add(new CroppedSprite(Url, m * info.CropInfo.Width, n * info.CropInfo.Height, info.CropInfo.Width, info.CropInfo.Height));
+                        Sprites.Add(new CroppedSprite(Url, m * info.Unit.Width, n * info.Unit.Height, info.Unit.Width, info.Unit.Height));
                     }
                 }
             }

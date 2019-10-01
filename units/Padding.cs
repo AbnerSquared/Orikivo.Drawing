@@ -1,8 +1,13 @@
 ﻿namespace Orikivo.Poxel
 {
-    // free space surrounding the object.
-    public class Padding
+    /// <summary>
+    /// An object containing the definitions of the whitespace surrounding a Bitmap.
+    /// </summary>
+    public struct Padding
     {
+        public static Padding FontDefault => new Padding(right: 1);
+        public static Padding Empty => new Padding(0);
+
         public Padding(int lrtb)
         {
             Left = Right = Top = Bottom = lrtb;

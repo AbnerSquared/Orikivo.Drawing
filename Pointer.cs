@@ -10,15 +10,15 @@ namespace Orikivo.Poxel
     {
         public Pointer(int leftPadding = 0, int topPadding = 0, int? maxWidth = null, int? maxHeight = null)
         {
-            _xOffset = leftPadding;
-            _yOffset = topPadding;
+            _leftPadding = leftPadding;
+            _topPadding = topPadding;
             _maxWidth = maxWidth;
             _maxHeight = maxHeight;
             
         }
 
-        private int _xOffset = 0;
-        private int _yOffset = 0;
+        private int _leftPadding = 0;
+        private int _topPadding = 0;
         private int? _maxWidth = null;
         private int? _maxHeight = null;
 
@@ -31,13 +31,21 @@ namespace Orikivo.Poxel
         public int Width => Rows.OrderByDescending(x => x).First();
 
         private int _height { get; set; } = 0;
-        public int Height => _yOffset + _height;
+        public int Height => _topPadding + _height;
 
         public int X { get; set; } = 0;
         public int Y { get; set; } = 0;
         public void MoveX(int len)
         {
             LastPos = (X, LastPos.Y);
+            /* handle resetting; think of a typewriter
+            if (_maxWidth < X + len)
+            {
+                ResetX();
+                X += len;
+            }
+            */
+
             X += len;
             Console.WriteLine($"-- Shifted X by {len} --");
         }
@@ -53,14 +61,12 @@ namespace Orikivo.Poxel
         public void ResetX()
         {
             Rows.Add(X);
-            Console.WriteLine($"-- Row of length '{X}' added --");
-            X = _xOffset;
+            Console.WriteLine($"-- Row of length '{X}' added. --");
+            X = _leftPadding;
         }
 
         public void ResetY()
-        {
-            Y = _yOffset;
-        }
+            => Y = _topPadding;
 
         public Size Size => new Size(Width, Height);
 

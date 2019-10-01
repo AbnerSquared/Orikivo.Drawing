@@ -6,15 +6,17 @@ namespace Orikivo.Poxel
 {
     public class CharSpriteMap : IDisposable
     {
-        public CharSpriteMap(FontFace font, string str, bool useNonEmptyWidth = true) : this(useNonEmptyWidth, font, str.ToCharArray()) { }
-        public CharSpriteMap(bool useNonEmptyWidth, FontFace font, params char[] chars)
+        public CharSpriteMap(string content, FontFace font, bool useNonEmptyWidth = true) : this(useNonEmptyWidth, font, content.ToCharArray()) { }
+        private CharSpriteMap(bool useNonEmptyWidth, FontFace font, params char[] chars)
         {
             (char c, Bitmap bmp)[] charMap = { };
             if (!(chars?.Length > 0))
                 throw new Exception("One char must be specified at minimum.");
 
+            // removes all instances of characters that aren't drawn onto a map.
+            chars = chars.Where(x => !(CharEmptyInfo.IsEmptyChar(x) || x == '\n')).ToArray();
             for (int i = 0; i < chars.Length; i++)
-                charMap[i] = (chars[i], Poxel.GetChar(chars[i], font));
+                    charMap[i] = (chars[i], Poxel.GetChar(chars[i], font));
 
             Values = charMap;
         }
@@ -26,6 +28,8 @@ namespace Orikivo.Poxel
         {
             get
             {
+                if (Disposed) // you can't get a disposed bitmap
+                    return null;
                 try
                 {
                     return Values.First(x => x.c == c).bmp;
