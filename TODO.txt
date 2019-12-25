@@ -1,0 +1,35 @@
+Drawing should be split into:
+
+Drawing: Contains all of the services
+used with Orikivo.
+
+Drawing.Core: Contains the root services
+used to help create or design sprites.
+
+Drawing.Core.BitmapUtils.GetOutline()
+Drawing.Core.BitmapUtils.GetNonEmptyWidth()
+BitmapUtils.GetHttpImage()
+BitmapUtils.GetLocalImage()
+BitmapUtils.Save()
+
+Drawing.Core.Poxel.DrawImage()
+Poxel.DrawLine()
+Poxel.DrawBinary()
+Poxel.Fill()
+
+Drawing.Core.PoxelBrush
+Drawing.Core.PoxelBrush.Size
+Drawing.Core.PoxelBrush.Color
+Drawing.Core.Sprite
+Drawing.Core.Sheet
+Drawing.Core.SpriteAnimator
+
+Drawing.CharMap
+Drawing.FontFace
+Drawing.PoxelObject
+Drawing.PoxelObjectLayer
+
+BasePoxel
+
+Poxel.ObjectColorMap
+
