@@ -337,6 +337,7 @@ namespace Orikivo.Drawing
 
         public static Rectangle ClampRectangle(System.Drawing.Point origin, Size size, System.Drawing.Point offset, Size innerSize)
         {
+            
                                                                                          // origin = (0, 0)
                                                                                          // offset = (-2, -5)
                                                                                          // innerSize = (8, 7)
@@ -369,6 +370,10 @@ namespace Orikivo.Drawing
                                                                                          // 7 - (5 + 0)
                                                                                          // 7 - 5
                                                                                          // 2
+
+            Console.WriteLine($"Origin = ({origin.X}, {origin.Y})\nOffset = ({offset.X}, {offset.Y})\nInnerSize = ({innerSize.Width}, {innerSize.Height})\nSize = ({size.Width}, {size.Height})");
+            Console.WriteLine($"ClampPoint = ({x}, {y})\nClampSize = ({width}, {height})");
+
 
             return new Rectangle(x, y, width, height); // (2, 5, 6, 2)
         }

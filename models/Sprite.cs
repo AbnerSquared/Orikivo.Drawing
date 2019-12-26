@@ -13,6 +13,12 @@ namespace Orikivo.Drawing
         {
             Id = id;
             Path = url;
+
+            using (Bitmap source = GetSource())
+            {
+                Width = source.Width;
+                Height = source.Height;
+            }
         }
 
         /// <summary>
@@ -26,6 +32,10 @@ namespace Orikivo.Drawing
         /// </summary>
         [JsonProperty("path")]
         public string Path { get; }
+
+        public int Width { get; }
+
+        public int Height { get; }
 
         /// <summary>
         /// Returns the <see cref="Bitmap"/> specified by <see cref="Path"/>.

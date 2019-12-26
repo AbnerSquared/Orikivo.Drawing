@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Text;
 
 namespace Orikivo.Drawing
 {
@@ -39,6 +40,7 @@ namespace Orikivo.Drawing
         /// </summary>
         protected abstract Bitmap GetBaseImage();
 
+        /*
         /// <summary>
         /// Returns the <see cref="Size"/> of the <see cref="Bitmap"/> returned from <see cref="GetBaseImage"/>.
         /// </summary>
@@ -50,6 +52,7 @@ namespace Orikivo.Drawing
                     MaxHeight.HasValue ? bmp.Height > MaxHeight.Value ? MaxHeight.Value : bmp.Height : bmp.Height);
             }
         }
+        */
 
         /// <summary>
         /// Returns the true <see cref="Bitmap"/> from the <see cref="DrawableLayer"/>.
@@ -62,34 +65,35 @@ namespace Orikivo.Drawing
 
             using (Bitmap image = GetBaseImage())
             {
-                Size size = GetSize();
+                Size size = new Size(
+                    MaxWidth.HasValue ? image.Width > MaxWidth.Value ? MaxWidth.Value : image.Width : image.Width,
+                    MaxHeight.HasValue ? image.Height > MaxHeight.Value ? MaxHeight.Value : image.Height : image.Height);
+
                 Bitmap result = new Bitmap(size.Width + Padding.Width, size.Height + Padding.Height);
 
                 // TODO: Use PixelGraphics
                 using (Graphics graphics = Graphics.FromImage(result))
                 {
                     // TODO: Make this method generic for any image.
-                    if (Offset.X > size.Width && Offset.Y > size.Height)
-                    {
-                        if (Offset.X < 0 || Offset.X + image.Width > size.Width ||
-                            Offset.Y < 0 || Offset.Y + image.Height > size.Height)
-                        {
-                            Rectangle cropRect = GraphicsUtils.ClampRectangle(Offset, size, Point.Empty, image.Size);
+                    GraphicsUtils.ClipAndDrawImage(graphics, image, new Point(Padding.Left, Padding.Top));
 
-                            using (Bitmap crop = BitmapUtils.Crop(image, cropRect))
-                                GraphicsUtils.ClipAndDrawImage(graphics, crop, Position);
-                        }
-                        else
-                            GraphicsUtils.ClipAndDrawImage(graphics, image, Position);
-
-                        // TODO: Create the generic color conversion into a GammaColorMap.
-                    }
 
                     // TODO: Implement ImageConfig manipulation.
                 }
 
+
                 return result;
             }
+        }
+
+        public void Log()
+        {
+            StringBuilder sb = new StringBuilder();
+
+
+
+
+            Console.WriteLine(sb.ToString());
         }
 
         /// <summary>

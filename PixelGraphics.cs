@@ -177,6 +177,10 @@ namespace Orikivo.Drawing
             bool autoWidth = useNonEmptyWidth && !font.IsMonospace;
             Padding padding = textPadding ?? Padding.Empty;
 
+
+            if (!extendOnOffset)
+                extendOnOffset = font.Customs?.Any(x => x.Offset != null) ?? extendOnOffset;
+
             Pointer cursor = new Pointer(maxWidth: maxWidth, maxHeight: maxHeight);
 
             List<char> chars = content.ToList();
@@ -286,6 +290,9 @@ namespace Orikivo.Drawing
 
         public Bitmap DrawString(string content, Color color, CanvasOptions options = null)
             => DrawString(content, CurrentFont, color, options);
+
+        public Bitmap DrawString(string content, CanvasOptions options = null)
+            => DrawString(content, CurrentFont, Colors?[Gamma.Max] ?? GammaColor.GammaGreen, options);
 
         public Bitmap DrawString(string content, FontFace font, CanvasOptions options = null)
             => DrawString(content, font, Colors?[Gamma.Max] ?? GammaColor.GammaGreen, options);
@@ -411,19 +418,40 @@ namespace Orikivo.Drawing
 
         }
         
-        public void CreateLine(System.Drawing.Point from, System.Drawing.Point to, int thickness, GammaColor color)
+        public void CreateLine(Point from, Point to, int thickness, GammaColor color)
         {
             // creates an image with a line drawn from a point to another point using the specified thickness and color.
         }
 
-        public void CreateFillable(GammaColor background, GammaColor foreground, int width, int height, float progress, FillDirection direction = FillDirection.Right)
+        public Bitmap DrawFillable(GammaColor background, GammaColor foreground, int width, int height, float progress, FillDirection direction = FillDirection.Right)
         {
-            float a = RangeF.Convert(0.0f, 1.0f, 0.0f, width, progress);
-            float b = RangeF.Convert(0.0f, 1.0f, 0.0f, height, progress); // Y fill
-            // background color is main field
-            // foreground is what the filled part will be colored
-            // the width and height specify the size
-            // progress ranges from 0.00 to 1.00, acting as however much of the shape will be filled. 
+            float a = RangeF.Convert(0.0f, 1.0f, 0.0f, width, progress); // x fill
+
+            // TODO: account for direction, using a 2D rotation matrix???
+            Bitmap result = new Bitmap(width, height);
+
+            using (Graphics g = Graphics.FromImage(result))
+            {
+                int fillWidth = (int)Math.Floor(a);
+
+                Rectangle fillClip = new Rectangle(0, 0, fillWidth, height);
+                using (SolidBrush fore = new SolidBrush(foreground))
+                {
+                    g.SetClip(fillClip);
+                    g.FillRectangle(fore, fillClip);
+                    g.ResetClip();
+                }
+
+                Rectangle emptyClip = new Rectangle(fillWidth, 0, width - fillWidth, height);
+                using (SolidBrush back = new SolidBrush(background))
+                {
+                    g.SetClip(emptyClip);
+                    g.FillRectangle(back, emptyClip);
+                    g.ResetClip();
+                }
+            }
+
+            return result;
         }
 
         public void CreateFillable(GammaColor background, GammaColor foreground, int width, int height, float progress, float angle)

@@ -7,12 +7,13 @@ namespace Orikivo.Drawing
     public class CustomCharInfo
     {
         [JsonConstructor]
-        public CustomCharInfo(char[] chars, int? width = null, int? height = null, System.Drawing.Point? offset = null)
+        public CustomCharInfo(char[] chars, int? width = null, int? height = null, int? offsetX = null, int? offsetY = null)
         {
             Chars = chars;
             Width = width;
             Height = height;
-            Offset = offset;
+            OffsetX = offsetX;
+            OffsetY = offsetY;
         }
 
         [JsonProperty("chars")]
@@ -24,7 +25,15 @@ namespace Orikivo.Drawing
         [JsonProperty("height")]
         public int? Height { get; }
 
-        [JsonProperty("offset")]
-        public System.Drawing.Point? Offset { get; }
+        [JsonProperty("offset_x")]
+        public int? OffsetX { get; }
+
+        [JsonProperty("offset_y")]
+        public int? OffsetY { get; }
+
+        [JsonIgnore]
+        public Point? Offset => (OffsetX.HasValue || OffsetY.HasValue) ?
+            (Point?) new Point(OffsetX.GetValueOrDefault(0), OffsetY.GetValueOrDefault(0))
+            : null;
     }
 }

@@ -88,7 +88,10 @@ namespace Orikivo.Drawing
                 throw new ArgumentOutOfRangeException("The specified row or column is out of range.");
 
             SheetOverride crop = Overrides.FirstOrDefault(x => x.Row == row && x.Column == column) ?? SheetOverride.Empty;
-            
+
+            if (RowCount == 1 && ColumnCount == 1)
+                return GetSource();
+
             return BitmapUtils.Crop(Path, (CropWidth * column - 1) + crop.Offset.X, (CropHeight * row - 1) + crop.Offset.Y,
                 crop.Width ?? CropWidth, crop.Height ?? CropHeight);
         }

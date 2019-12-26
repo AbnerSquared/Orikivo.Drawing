@@ -7,10 +7,12 @@ namespace Orikivo.Drawing
     /// <summary>
     /// A custom <see cref="Bitmap"/> that supports layering and detailed configurables.
     /// </summary>
-    public class Drawable //: IDisposable
+    public class Drawable : IDisposable
     {
         public Drawable(int width, int height)
-            => new Drawable(new Size(width, height));
+        {
+            Viewport = new Size(width, height);
+        }
 
         public Drawable(Size viewport)
         {
@@ -116,7 +118,55 @@ namespace Orikivo.Drawing
         /// </summary>
         public Bitmap Build()
         {
-            throw new NotImplementedException();
+            Bitmap result = new Bitmap(Size.Width, Size.Height);
+            using (Graphics graphics = Graphics.FromImage(result))
+            {
+                foreach (DrawableLayer layer in InternalLayers)
+                {
+                    using (Bitmap bmp = layer.Build())
+                    {
+                        if (layer.Offset.X > Viewport.Width && layer.Offset.Y > Viewport.Height)
+                        {
+                            if (layer.Offset.X < 0 || layer.Offset.X + bmp.Width > Viewport.Width ||
+                                layer.Offset.Y < 0 || layer.Offset.Y + bmp.Height > Viewport.Height)
+                            {
+                                Rectangle cropRect = GraphicsUtils.ClampRectangle(Origin, Viewport, layer.Offset, bmp.Size);
+
+                                using (Bitmap crop = BitmapUtils.Crop(bmp, cropRect))
+                                    GraphicsUtils.ClipAndDrawImage(graphics, crop, layer.Position);
+
+                                continue;
+                            }
+                        }
+
+                        GraphicsUtils.ClipAndDrawImage(graphics, bmp, new Point(Padding.Left + layer.Offset.X, Padding.Top + layer.Offset.Y));
+                    }
+                }
+            }
+
+            result = BitmapUtils.SetColorMaps(result, GammaColorMap.Default, Colors);
+
+            if (Scale > ImageScale.Small)
+                result = GraphicsUtils.Scale(result, (int)Scale, (int)Scale);
+
+
+
+            return result;
+        }
+
+        public Bitmap DisposeBuild()
+        {
+            Bitmap bmp = Build();
+            Dispose();
+            return bmp;
+        }
+
+        public virtual void Dispose()
+        {
+            foreach (DrawableLayer layer in InternalLayers)
+            {
+                layer.Dispose();
+            }
         }
     }
 }

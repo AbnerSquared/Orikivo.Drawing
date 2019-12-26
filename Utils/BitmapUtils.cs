@@ -29,12 +29,12 @@ namespace Orikivo.Drawing
             if (fromColors.Length != toColors.Length)
                 throw new Exception("The 'from' and 'to' color arrays must be the same length.");
 
-            (Color, Color)[] colors = { };
+            List<(Color, Color)> colors = new List<(Color, Color)>();
 
             for (int i = 0; i < fromColors.Length; i++)
-                colors[i] = (fromColors[i], toColors[i]);
+                colors.Add((fromColors[i], toColors[i]));
 
-            return CreateColorMaps(colors);
+            return CreateColorMaps(colors.ToArray());
         }
 
         internal static ColorMap[] CreateColorMaps(params (Color From, Color To)[] colors)
@@ -52,7 +52,7 @@ namespace Orikivo.Drawing
         // remember that a discord image container has a border radius of 3px
         // to prevent pixels from looking wonky, add a minimum padding of 4px
         public static Bitmap SetColorMaps(Bitmap bmp, GammaColorMap from, GammaColorMap to)
-            => SetColorMaps(bmp, CreateColorMaps(from.Values.Cast<Color>().ToArray(), to.Values.Cast<Color>().ToArray()));
+            => SetColorMaps(bmp, CreateColorMaps(from.Values.Select(x => (Color)x).ToArray(), to.Values.Select(x => (Color)x).ToArray()));
 
         public static Bitmap SetColorMaps(Bitmap bmp, ColorMap[] mapTable)
         {
@@ -192,6 +192,9 @@ namespace Orikivo.Drawing
             using (Bitmap bmp = new Bitmap(localPath))
                 return Crop(bmp, x, y, width, height);
         }
+
+        public static Bitmap AutoCrop(Bitmap bmp, bool disposeOnCrop = false)
+            => Crop(bmp, new Rectangle(0, 0, GetNonEmptyWidth(bmp), bmp.Height), disposeOnCrop);
 
         public static Bitmap Crop(Bitmap bmp, int x, int y, int width, int height, bool disposeOnCrop = false)
             => Crop(bmp, new Rectangle(x, y, width, height), disposeOnCrop);
