@@ -4,6 +4,7 @@ using System.Drawing;
 
 namespace Orikivo.Drawing
 {
+    // Doesn't currently work.
     public class GrayscaleQuantizer : PaletteQuantizer
     {
         public GrayscaleQuantizer() : base (new ArrayList())

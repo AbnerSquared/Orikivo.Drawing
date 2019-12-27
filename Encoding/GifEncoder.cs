@@ -6,6 +6,11 @@ using System.Linq;
 namespace Orikivo.Drawing.Encoding
 {
 
+    // TODO: Create a Decoder version of this class, which allows for the loading of GIF files, frame-by-frame.
+    // This could most likely be utilized with Encoding/Raw, as the base classes contain what a GIF needs to decode.
+
+    // NOTE: Referenced from the following GitHub projects:
+    // https://github.com/DataDink/Bumpkit/blob/master/BumpKit/BumpKit/GifEncoder.cs
     /// <summary>
     /// A disposable class providing access to construct Graphical Interchange Format files, otherwise known as GIF.
     /// </summary>
@@ -51,7 +56,7 @@ namespace Orikivo.Drawing.Encoding
         public void EncodeFrame(Image image, Point? offset = null, TimeSpan? frameLength = null)
         {
             Point imageOffset = offset ?? Point.Empty;
-            // TODO: Handle out of bounds offset. (Refer to ObjectLayer.Build())
+            // TODO: Handle out of bounds offset. (Refer to DrawableLayer.Build())
 
             using (MemoryStream source = new MemoryStream())
             {

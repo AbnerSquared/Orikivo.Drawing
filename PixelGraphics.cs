@@ -88,7 +88,7 @@ namespace Orikivo.Drawing
 
             CharMapIndex i = GraphicsUtils.GetCharIndex(c, CharMap);
 
-            if (!i.IsSuccess)
+            if (!i.IsSuccess || !font.SheetUrls.Keys.Contains(i.Page))
             {
                 // if (!font.HideBadUnicode) TODO: This should return the UNKNOWN unicode sprite.
                 //    return new Bitmap(); 
@@ -117,7 +117,10 @@ namespace Orikivo.Drawing
                     return CharCache[c];
 
             Bitmap bmp = GetRawChar(c, font);
-            
+
+            if (bmp == null)
+                return bmp;
+
             if (!font.IsMonospace && useNonEmptyWidth) // NOTE: I don't even think this is needed.
             {
                 // might be too taxing
@@ -160,6 +163,16 @@ namespace Orikivo.Drawing
                 if (charMap.ContainsKey(chars[i]))
                     continue;
 
+
+                /* Safe Dispose if null
+                 using (Bitmap tmp = GetChar(chars[i], font, useNonEmptyWidth))
+                {
+                    if (tmp != null)
+                        charMap[chars[i]] = tmp.Clone(new Rectangle(Point.Empty, tmp.Size), tmp.PixelFormat);
+                }
+                 
+                 
+                 */
                 charMap[chars[i]] = GetChar(chars[i], font, useNonEmptyWidth);
             }
 
@@ -267,16 +280,19 @@ namespace Orikivo.Drawing
                     }
                 }
 
-                charObjects.Add(
-                    new CharObject(
-                        spriteMap[c],
-                        c,
-                        new System.Drawing.Point(padding.Left + cursor.X, padding.Top + cursor.Y),
-                        new Size(drawWidth, font.CharHeight),
-                        font.Padding,
-                        font.GetCharOffset(c)));
+                if (spriteMap[c] != null)
+                {
+                    charObjects.Add(
+                        new CharObject(
+                            spriteMap[c],
+                            c,
+                            new System.Drawing.Point(padding.Left + cursor.X, padding.Top + cursor.Y),
+                            new Size(drawWidth, font.CharHeight),
+                            font.Padding,
+                            font.GetCharOffset(c)));
 
-                cursor.MoveX(cursorWidth);
+                    cursor.MoveX(cursorWidth);
+                }
                 charIndex++;
             }
 

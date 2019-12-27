@@ -7,6 +7,10 @@ using System.Linq;
 namespace Orikivo.Drawing
 {
     // an immutable color
+
+    /// <summary>
+    /// An immutable color object that supports multi-tone grouping and conversion formulas.
+    /// </summary>
     public struct GammaColor
     {
         public static GammaColor NeonRed = new GammaColor(0xF8427D);
@@ -20,6 +24,22 @@ namespace Orikivo.Drawing
         private const float R_LUMINANCE = 0.2126f;
         private const float G_LUMINANCE = 0.7152f;
         private const float B_LUMINANCE = 0.0722f;
+
+        private static byte GetByteAmount(float amount)
+        {
+            if (!RangeF.Percent.Contains(amount))
+                throw new ArithmeticException("The amount value specified is outside of the range [0.0, 1.0].");
+
+            return (byte) MathF.Floor(255 * amount);
+        }
+
+        public static GammaColor FromRange(float r, float g, float b, float a = 1.0f)
+        {
+            return new GammaColor(GetByteAmount(r),
+                                  GetByteAmount(g),
+                                  GetByteAmount(b),
+                                  GetByteAmount(a));
+        }
 
         public static GammaColor FromCmyk(float c, float m, float y, float k)
         {
@@ -56,7 +76,7 @@ namespace Orikivo.Drawing
 
         public static GammaColor FromHsl(float h, float s, float l)
         {
-            if (!RangeF.Angle.Contains(h) || !RangeF.Percent.All(s, l))
+            if (!RangeF.Degree.Contains(h) || !RangeF.Percent.All(s, l))
                 throw new ArgumentException("One of the specified float values are out of range.");
 
             float c = (1 - Math.Abs((2 * l) - 1)) * s;
@@ -68,7 +88,7 @@ namespace Orikivo.Drawing
 
         public static GammaColor FromHsv(float h, float s, float v)
         {
-            if (!RangeF.Angle.Contains(h) || !RangeF.Percent.All(s, v))
+            if (!RangeF.Degree.Contains(h) || !RangeF.Percent.All(s, v))
                 throw new ArgumentException("One of the specified float values are out of range.");
 
             float c = v * s;
@@ -216,6 +236,42 @@ namespace Orikivo.Drawing
             byte red = (byte) Math.Abs(a.R - b.R);
             byte green = (byte) Math.Abs(a.G - b.G);
             byte blue = (byte) Math.Abs(a.B - b.B);
+
+            return new GammaColor(red, green, blue);
+        }
+
+        public static GammaColor Addition(GammaColor a, GammaColor b)
+        {
+            byte red = (byte)Math.Min(255, a.R + b.R);
+            byte green = (byte)Math.Min(255, a.G + b.G);
+            byte blue = (byte)Math.Min(255, a.B + b.B);
+
+            return new GammaColor(red, green, blue);
+        }
+
+        public static GammaColor Subtract(GammaColor a, GammaColor b)
+        {
+            byte red = (byte)Math.Min(0, a.R - b.R);
+            byte green = (byte)Math.Min(0, a.G - b.G);
+            byte blue = (byte)Math.Min(0, a.B - b.B);
+
+            return new GammaColor(red, green, blue);
+        }
+
+        public static GammaColor DarkenOnly(GammaColor a, GammaColor b)
+        {
+            byte red = Math.Min(a.R, b.R);
+            byte green = Math.Min(a.G, b.G);
+            byte blue = Math.Min(a.B, b.G);
+
+            return new GammaColor(red, green, blue);
+        }
+
+        public static GammaColor LightenOnly(GammaColor a, GammaColor b)
+        {
+            byte red = Math.Max(a.R, b.R);
+            byte green = Math.Max(a.G, b.G);
+            byte blue = Math.Max(a.B, b.B);
 
             return new GammaColor(red, green, blue);
         }

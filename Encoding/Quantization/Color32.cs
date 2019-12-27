@@ -4,6 +4,12 @@ using System.Runtime.InteropServices;
 
 namespace Orikivo.Drawing
 {
+    // NOTE: Referenced from the following GitHub projects:
+    // https://github.com/mrousavy/AnimatedGif
+
+    /// <summary>
+    /// Represents a <see cref="Color"/> object that is set according to <see cref="IntPtr"/>.
+    /// </summary>
     [StructLayout(LayoutKind.Explicit)]
     public struct Color32
     {

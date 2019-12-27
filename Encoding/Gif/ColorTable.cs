@@ -1,6 +1,6 @@
-﻿namespace Orikivo.Drawing
+﻿namespace Orikivo.Drawing.Encoding.Gif
 {
-    public class GifColorTable
+    public class ColorTable
     {
         // Red
         byte Red;

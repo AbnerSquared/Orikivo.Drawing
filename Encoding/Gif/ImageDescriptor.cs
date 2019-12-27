@@ -1,6 +1,6 @@
-﻿namespace Orikivo.Drawing
+﻿namespace Orikivo.Drawing.Encoding.Gif
 {
-    public class GifImageDescriptor
+    public class ImageDescriptor
     {
         
         ushort LeftOffset; // 2 bytes

@@ -14,14 +14,16 @@ namespace Orikivo.Drawing
         {
             Values = new T[size.Height, size.Width];
 
-            if (defaultValue != default)
+            // TODO: Figure out why this no longer works.
+            //if (defaultValue != default)
                 Clear(defaultValue);
         }
+
         public Grid(int width, int height, T defaultValue = default)
         {
             Values = new T[height, width];
 
-            if (defaultValue != default)
+            //if (defaultValue != default)
                 for (int y = 0; y < height; y++)
                     for (int x = 0; x < width; x++)
                         Values[y, x] = defaultValue;

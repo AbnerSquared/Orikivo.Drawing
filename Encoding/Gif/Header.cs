@@ -1,6 +1,6 @@
-﻿namespace Orikivo.Drawing
+﻿namespace Orikivo.Drawing.Encoding.Gif
 {
-    public class GifHeader
+    public class Header
     {
         // Signature: GIF, 3 bytes (ALWAYS KEEP)
         byte[] Signature = { (byte) 'G', (byte) 'I', (byte) 'F' };

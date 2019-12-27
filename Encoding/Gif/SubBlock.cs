@@ -1,6 +1,6 @@
-﻿namespace Orikivo.Drawing
+﻿namespace Orikivo.Drawing.Encoding.Gif
 {
-    public class GifSubBlock
+    public class SubBlock
     {
         byte ByteCount;
         byte[] Data; // 1-255 bytes long

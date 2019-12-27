@@ -1,6 +1,6 @@
-﻿namespace Orikivo.Drawing
+﻿namespace Orikivo.Drawing.Encoding.Gif
 {
-    public class GifScreenDescriptor
+    public class ScreenDescriptor
     {
         // Logical Screen Descriptor (get from GIF)
         ushort ScreenWidth; // 2 bytes, minimum width required to display image data

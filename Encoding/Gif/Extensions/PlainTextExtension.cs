@@ -1,19 +1,19 @@
-﻿namespace Orikivo.Drawing
+﻿namespace Orikivo.Drawing.Encoding.Gif
 {
-    public class GifPlainTextExtension
+    public class PlainTextExtension
     {
         byte Introducer;
         byte Label; // 01 == Plain Text Extension
         byte BlockSize;
-        ushort LeftTextGrid; // x pos
-        ushort TopTextGrid; // y pos
+        ushort LeftTextGrid; // x pos UInt16 MaxValue = 65535;
+        ushort TopTextGrid; // y pos UInt16 MaxValue = 65535;
         ushort TextGridWidth;
         ushort TextGridHeight;
         byte CellWidth;
         byte CellHeight;
         byte TextForegroundColorIndex;
         byte TextBackgroundColorIndex;
-        GifSubBlock[] PlainTextData; // infinite
+        SubBlock[] PlainTextData; // infinite
         byte Terminator = 0x00;
     }
 }

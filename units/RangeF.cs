@@ -1,4 +1,6 @@
-﻿namespace Orikivo.Drawing
+﻿using System;
+
+namespace Orikivo.Drawing
 {
     // TODO: Implement markers, which allow sub-ranges, returning the ends of where a value is in between markers.
     public struct RangeF
@@ -15,6 +17,14 @@
                 return toMin;
 
             return (((value - fromMin) * to) / from) + toMin;
+        }
+
+        /// <summary>
+        /// Flattens the <see cref="RangeF"/> as whole numbers.
+        /// </summary>
+        public static RangeF Truncate(RangeF range)
+        {
+            return new RangeF(MathF.Truncate(range.Min), MathF.Truncate(range.Max), range.InclusiveMin, range.InclusiveMax);
         }
 
         public static float Clamp(RangeF range, float value)
@@ -47,10 +57,20 @@
         }
 
         public static RangeF Percent => new RangeF(0.00f, 1.00f);
-        public static RangeF Angle => new RangeF(0.00f, 360.00f, true, false);
-        public static RangeF Byte => new RangeF(0, 255);
-        public static RangeF DayHours => new RangeF(0.00f, 24.00f, true, false);
-        public static RangeF TimeOffset => new RangeF(-14.00f, 14.00f);
+        public static RangeF Normal => new RangeF(-1.00f, 1.00f);
+        public static RangeF Degree => new RangeF(0.00f, 360.00f, true, false);
+        // hours in a day : 0, 24
+        // offset : -14, 14
+
+        /// <summary>
+        /// The lower bound of the current <see cref="RangeF"/>.
+        /// </summary>
+        public float LowerBound => InclusiveMin ? Min : (Min - float.Epsilon);
+
+        /// <summary>
+        /// The upper bound of the current <see cref="RangeF"/>.
+        /// </summary>
+        public float UpperBound => InclusiveMax ? Max : (Max - float.Epsilon);
 
         public float Min { get; }
 
@@ -59,6 +79,8 @@
         public bool InclusiveMin { get; }
 
         public bool InclusiveMax { get; }
+
+        public float Length => MathF.Abs(UpperBound - LowerBound);
 
         public float Clamp(float value)
             => Clamp(Min, Max, value);

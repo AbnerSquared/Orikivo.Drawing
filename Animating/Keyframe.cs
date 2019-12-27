@@ -1,34 +1,38 @@
-﻿using System.Drawing;
-
-namespace Orikivo.Drawing
+﻿namespace Orikivo.Drawing
 {
-    // used to pinpoint a specific transformation on a 
+    /// <summary>
+    /// Represents a transform that applies to a <see cref="TimelineLayer"/> within a <see cref="TimelineAnimator"/>.
+    /// </summary>
     public struct Keyframe
     {
         public static Keyframe GetDefault(long tick) => new Keyframe(tick, 1.0f, null);
 
-        public Keyframe(long tick, float opacity = 1.0f, Transform2D? transform = null)
+        public Keyframe(long tick, float opacity = 1.0f, FlatTransform? transform = null)
         {
             Tick = tick;
             Opacity = opacity;
-            Transform = transform ?? Transform2D.Default;
+            Transform = transform ?? FlatTransform.Default;
         }
 
-        public Keyframe(long tick, float opacity, PointF position, float rotation, Vector2 scale)
+        public Keyframe(long tick, float opacity, System.Drawing.PointF position, float rotation, Vector2 scale)
         { 
             Tick = tick;
             Opacity = opacity;
-            Transform = new Transform2D(position, rotation, scale);
+            Transform = new FlatTransform(position, rotation, scale);
         }
 
         public long Tick { get; }
-        public Transform2D Transform { get; }
+        public FlatTransform Transform { get; }
         public float Opacity { get; }
 
-        public PointF Position => Transform.Position;
+        public System.Drawing.PointF Position => Transform.Position;
 
         public float Rotation => Transform.Rotation;
 
-        public Vector2 Scale => Transform.Scale;
+        public Vector2 Scale
+        {
+            get => Transform.Scale;
+            set => Transform.Scale = value;
+        }
     }
 }

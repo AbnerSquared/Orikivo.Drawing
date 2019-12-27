@@ -1,6 +1,6 @@
-﻿namespace Orikivo.Drawing
+﻿namespace Orikivo.Drawing.Encoding.Gif
 {
-    public enum GifDisposalMethod : byte
+    public enum DisposalMethod : byte
     {
         Unspecified = 0x00,
         DoNotDispose = 0x01,
@@ -8,7 +8,20 @@
         OverrideWithPrevious = 0x04
     }
 
-    public class GifGraphicsControlExtension
+    public class GraphicsControl
+    { // Always uses the Introducer Marker => '!'
+        public byte LabelId => (byte)ExtensionLabel.GraphicsControl; // F9
+        // Packed, aka inner data
+        public bool TransparentColorFlag;
+        public bool UserInputFlag;
+        public DisposalMethod OnDisposal;
+        public byte Reserved; // 210
+
+        public ushort DelayTime;
+        public byte? ColorIndex; // ONLY IF TransparentColorFlag == true
+    } // Always uses a Terminator => 0x00 NULL
+
+    public class GraphicsControlExtension
     {
         byte Introducer;
         byte Label; // F9 == Graphics Control Extension
@@ -29,6 +42,8 @@
         // unused in 89a, set to 0
 
         ushort DelayTime;
+        byte DelayHighByte;
+        byte DelayLowByte;
         // if 0, no delay is used
         // byte DelayHighByte
         // byte DelayLowByte

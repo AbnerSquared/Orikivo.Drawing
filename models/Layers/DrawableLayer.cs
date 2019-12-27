@@ -1,9 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
 namespace Orikivo.Drawing
 {
+    public abstract class LayerGroup : DrawableLayer
+    {
+        public List<DrawableLayer> Layers { get; } = new List<DrawableLayer>();
+        public List<DrawableLayer> UngroupLayers() // what this class does, is modify the offsets made here to each layer synchronously.
+        {
+            // this makes it easier to modify layers at the same time.
+            // each layer in this class can have their own local offset for each other, which is utilized
+
+            throw new NotImplementedException();
+        }
+    }
+    public abstract class LayerGroup<TLayer> : DrawableLayer
+        where TLayer : DrawableLayer
+    {
+
+    }
+
+
     public abstract class DrawableLayer : IDisposable
     {
         protected bool Disposed { get; set; }
@@ -58,7 +77,7 @@ namespace Orikivo.Drawing
         /// Returns the true <see cref="Bitmap"/> from the <see cref="DrawableLayer"/>.
         /// </summary>
         /// <returns></returns>
-        public Bitmap Build()
+        public virtual Bitmap Build()
         {
             if (Disposed)
                 throw new ObjectDisposedException("The layer has already been disposed.");
@@ -84,16 +103,6 @@ namespace Orikivo.Drawing
 
                 return result;
             }
-        }
-
-        public void Log()
-        {
-            StringBuilder sb = new StringBuilder();
-
-
-
-
-            Console.WriteLine(sb.ToString());
         }
 
         /// <summary>
