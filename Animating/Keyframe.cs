@@ -1,4 +1,6 @@
-﻿namespace Orikivo.Drawing
+﻿using Orikivo.Drawing.Graphics2D;
+
+namespace Orikivo.Drawing
 {
     /// <summary>
     /// Represents a transform that applies to a <see cref="TimelineLayer"/> within a <see cref="TimelineAnimator"/>.
@@ -7,14 +9,14 @@
     {
         public static Keyframe GetDefault(long tick) => new Keyframe(tick, 1.0f, null);
 
-        public Keyframe(long tick, float opacity = 1.0f, FlatTransform? transform = null)
+        public Keyframe(long tick, float opacity = 1.0f, FlatTransform transform = null)
         {
             Tick = tick;
             Opacity = opacity;
             Transform = transform ?? FlatTransform.Default;
         }
 
-        public Keyframe(long tick, float opacity, System.Drawing.PointF position, float rotation, Vector2 scale)
+        public Keyframe(long tick, float opacity, Vector2 position, float rotation, Vector2 scale)
         { 
             Tick = tick;
             Opacity = opacity;
@@ -25,7 +27,7 @@
         public FlatTransform Transform { get; }
         public float Opacity { get; }
 
-        public System.Drawing.PointF Position => Transform.Position;
+        public Vector2 Position => Transform.Position;
 
         public float Rotation => Transform.Rotation;
 

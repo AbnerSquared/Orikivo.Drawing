@@ -9,7 +9,7 @@ namespace Orikivo.Drawing
     /// <summary>
     /// A custom <see cref="Graphics"/> class that supports pixelated imagery.
     /// </summary>
-    public class PixelGraphics : IDisposable
+    public class PixelGraphics : IDisposable // LAYER MASKING, OUTLINES
     {
         private readonly Graphics _graphics;
         private static readonly string _defaultFontDirectory = "../assets/fonts/";
@@ -222,7 +222,7 @@ namespace Orikivo.Drawing
                     charObjects.Add(new CharObject(
                         null,
                         c,
-                        new System.Drawing.Point(padding.Left + cursor.X, padding.Top + cursor.Y),
+                        new Point(padding.Left + cursor.X, padding.Top + cursor.Y),
                         new Size(0, font.CharHeight)));
 
                     cursor.ResetX();
@@ -239,7 +239,7 @@ namespace Orikivo.Drawing
                     charObjects.Add(new CharObject(
                         null,
                         c,
-                        new System.Drawing.Point(padding.Left + cursor.X, padding.Top + cursor.Y),
+                        new Point(padding.Left + cursor.X, padding.Top + cursor.Y),
                         new Size(emptyWidth, font.CharHeight)));
 
                     cursor.MoveX(emptyWidth);
@@ -286,7 +286,7 @@ namespace Orikivo.Drawing
                         new CharObject(
                             spriteMap[c],
                             c,
-                            new System.Drawing.Point(padding.Left + cursor.X, padding.Top + cursor.Y),
+                            new Point(padding.Left + cursor.X, padding.Top + cursor.Y),
                             new Size(drawWidth, font.CharHeight),
                             font.Padding,
                             font.GetCharOffset(c)));
@@ -389,26 +389,26 @@ namespace Orikivo.Drawing
             return bmp;
         }
 
-        public void DrawStream() { }
-        public void DrawOutline() { }
-        public void DrawAndFillOutline() { }
-        public void DrawText() { }
-        public void DrawShadow() { } // Elevate
-        public void DrawHttpImage() { }
-        public void Recolor() { }
+        //public void DrawStream() { }
+        //public void DrawOutline() { }
+        //public void DrawAndFillOutline() { }
+        //public void DrawText() { }
+        //public void DrawShadow() { } // Elevate
+        //public void DrawHttpImage() { }
+        //public void Recolor() { }
 
-        public void SetSize(int width, int height)
-        {
+        //public void SetSize(int width, int height)
+        //{
             // simply sets the new image sizes to the specified width and height
-        }
+        //}
 
-        public void SetSize(Vector2 scalar)
-        {
+        //public void SetSize(Vector2 scalar)
+        //{
             // resizes the specified size to a new size based off of the values specified in the scalar.
-        }
+        //}
 
-        private static int GetScalarLength(int length, float scalar)
-            => (int) Math.Floor(length * scalar);
+        //private static int GetScalarLength(int length, float scalar)
+        //    => (int) Math.Floor(length * scalar);
 
         public Bitmap CreateSolid(GammaColor color, int width, int height)
         {
@@ -417,27 +417,27 @@ namespace Orikivo.Drawing
 
         // blending between two colors.
         // THIS CAN BE DONE.
-        public void CreateGradient(GammaColor from, GammaColor to, int width, int height, float angle)
-        {
+        //public void CreateGradient(GammaColor from, GammaColor to, int width, int height, AngleF angle)
+        //{
             
             // 1.00f / width = 1 segment
-        }
+        //}
 
         // float is from 0.00f to 1.00f, where 0.50 is the midpoint of the specified angle.
-        public void CreateGradient(Dictionary<float, GammaColor> colorKeyframes, int width, int height, float angle)
-        {
+        //public void CreateGradient(Dictionary<float, GammaColor> colorKeyframes, int width, int height, AngleF angle)
+        //{
 
-        }
+        //}
 
-        public void CreateGradient(GammaColorMap colors, int width, int height, float angle)
-        {
+        //public void CreateGradient(GammaColorMap colors, int width, int height, AngleF angle)
+        //{
 
-        }
+        //}
         
-        public void CreateLine(Point from, Point to, int thickness, GammaColor color)
-        {
+        //public void CreateLine(Point from, Point to, int thickness, GammaColor color)
+        //{
             // creates an image with a line drawn from a point to another point using the specified thickness and color.
-        }
+        //}
 
         public Bitmap DrawFillable(GammaColor background, GammaColor foreground, int width, int height, float progress, FillDirection direction = FillDirection.Right)
         {
@@ -470,10 +470,10 @@ namespace Orikivo.Drawing
             return result;
         }
 
-        public void CreateFillable(GammaColor background, GammaColor foreground, int width, int height, float progress, float angle)
-        {
+        //public void DrawFillable(GammaColor background, GammaColor foreground, int width, int height, float progress, AngleF angle)
+        //{
 
-        }
+        //} 
 
         // gets rid of all rendered objects
         public void Dispose()

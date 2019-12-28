@@ -64,14 +64,26 @@ namespace Orikivo.Drawing
         public static bool operator ==(AngleF a, float b)
             => a.Degrees == Wrap(b);
 
+        public static bool operator ==(float a, AngleF b)
+            => b.Degrees == Wrap(a);
+
         public static bool operator !=(AngleF a, float b)
             => a.Degrees != Wrap(b);
+
+        public static bool operator !=(float a, AngleF b)
+            => b.Degrees != Wrap(a);
 
         public static AngleF operator +(AngleF a, float b)
             => a.Degrees + Wrap(b);
 
+        public static AngleF operator +(float a, AngleF b)
+            => b.Degrees + Wrap(a);
+
         public static AngleF operator -(AngleF a, float b)
             => a.Degrees - Wrap(b);
+
+        public static AngleF operator -(float a, AngleF b)
+            => Wrap(a) - b.Degrees;
 
         public static AngleF operator *(AngleF a, float b)
         {
@@ -79,6 +91,14 @@ namespace Orikivo.Drawing
             b = t == 0.0f ? 1.0f : t;
 
             return a.Degrees * b;
+        }
+
+        public static AngleF operator *(float a, AngleF b)
+        {
+            float t = a % 1.0f;
+            a = t == 0.0f ? 1.0f : t;
+
+            return b.Degrees * a;
         }
 
         public static AngleF operator /(AngleF a, float b)
@@ -97,8 +117,5 @@ namespace Orikivo.Drawing
 
         public static implicit operator AngleF(float f)
             => new AngleF(f);
-
-        public static implicit operator AngleF(int i)
-            => new AngleF(i);
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Orikivo.Drawing.Graphics3D;
 using System.Drawing.Drawing2D;
 using static System.MathF;
+using Orikivo.Drawing.Graphics2D;
 
 namespace Orikivo.Drawing
 {
@@ -35,30 +36,18 @@ namespace Orikivo.Drawing
         //}
 
         // Create a version that can read the bitmap.
-        private static Size GetRotationSize(int oldWidth, int oldHeight, float angle)
+        private static Size GetRotationBounds(int oldWidth, int oldHeight, AngleF angle)
         {
-            float gamma = 90;
-            float beta = 180 - angle - gamma;
+            AngleF gamma = 90.0f;
+            AngleF beta = 180.0f - angle - gamma;
 
             float c1 = oldHeight;
-
-            float a1 = (c1 *
-                Sin(Utils.Radians(angle)) /
-                Sin(Utils.Radians(gamma)));
-
-            float b1 = (c1 * 
-                Sin(Utils.Radians(beta)) /
-                Sin(Utils.Radians(gamma)));
-
             float c2 = oldWidth;
 
-            float a2 = (c2 *
-                Sin(Utils.Radians(angle)) /
-                Sin(Utils.Radians(gamma)));
-
-            float b2 = (c2 *
-                Sin(Utils.Radians(beta)) /
-                Sin(Utils.Radians(gamma)));
+            float a1 = c1 * Sin(angle.Radians) / Sin(gamma.Radians);
+            float b1 = c1 * Sin(beta.Radians) / Sin(gamma.Radians);
+            float a2 = c2 * Sin(angle.Radians) / Sin(gamma.Radians);
+            float b2 = c2 * Sin(beta.Radians) / Sin(gamma.Radians);
 
             int width = (int)Floor(b2 + a1);
             int height = (int)Floor(b1 + a2);
@@ -66,9 +55,9 @@ namespace Orikivo.Drawing
             return new Size(width, height);
         }
 
-        public static Bitmap Rotate(Bitmap bmp, float angle)
+        public static Bitmap Rotate(Bitmap bmp, AngleF angle)
         {
-            Size rot = GetRotationSize(bmp.Width, bmp.Height, angle);
+            Size rot = GetRotationBounds(bmp.Width, bmp.Height, angle);
             Bitmap rotated = new Bitmap(rot.Width, rot.Height);
             using (Graphics g = Graphics.FromImage(rotated))
             {
@@ -148,7 +137,7 @@ namespace Orikivo.Drawing
                 using (Bitmap edited = ApplyTransform(bmp, transform, opacity))
                 {
                     // POSITION
-                    Point position = Point.Truncate(transform.Position);
+                    Point position = Point.Truncate(new PointF(transform.Position.X, transform.Position.Y));
                     if (position.X > viewport.Width && position.Y > viewport.Height)
                     {
                         if (position.X < 0 || position.X + edited.Width > viewport.Width ||
@@ -239,6 +228,75 @@ namespace Orikivo.Drawing
             }
 
             return bmp;
+        }
+
+        public static Bitmap ForceColors(Bitmap bmp, GammaColorMap colors)
+        {
+            unsafe
+            {
+                BitmapData source = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
+                int bitsPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat) / 8;
+                int pixelHeight = source.Height;
+                int byteWidth = source.Width * bitsPerPixel; // is == width
+                byte* ptr = (byte*)source.Scan0;
+
+                // NOTE: a for statement, all done at once.
+                Parallel.For(0, pixelHeight, y =>
+                {
+                    byte* row = ptr + (y * source.Stride);
+                    for (int x = 0; x < byteWidth; x = x + bitsPerPixel)
+                    {
+                        GammaColor color = new GammaColor(row[x + 2], row[x + 1], row[x], row[x + 3]);
+                        Color forcedColor = GammaColor.ClosestMatch(color, colors);
+
+                        // A
+                        //row[x + 3] = forcedColor.A;
+
+                        // R
+                        row[x + 2] = forcedColor.R;
+
+                        // G
+                        row[x + 1] = forcedColor.G;
+
+                        // B
+                        row[x] = forcedColor.B;
+                    }
+                });
+
+                bmp.UnlockBits(source);
+            }
+
+            return bmp;
+        }
+
+        public static Grid<Color> GetBitmapPixels(Bitmap bmp)
+        {
+            Grid<Color> pixels = new Grid<Color>(bmp.Width, bmp.Height, Color.Empty);
+
+            unsafe
+            {
+                BitmapData source = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
+                int bitsPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat) / 8;
+                int pixelHeight = source.Height;
+                int byteWidth = source.Width * bitsPerPixel; // is == width
+                byte* ptr = (byte*)source.Scan0;
+
+                // NOTE: a for statement, all done at once.
+                Parallel.For(0, pixelHeight, y =>
+                {
+                    byte* row = ptr + (y * source.Stride);
+                    for (int x = 0; x < byteWidth; x = x + bitsPerPixel)
+                    {
+                        Color color = new GammaColor(row[x + 2], row[x + 1], row[x], row[x + 3]);
+
+                        pixels.SetValue(color, x / bitsPerPixel, y);
+                    }
+                });
+
+                bmp.UnlockBits(source);
+            }
+
+            return pixels;
         }
 
         // This converts every single pixel on this image to the colors specified.

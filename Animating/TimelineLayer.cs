@@ -62,7 +62,7 @@ namespace Orikivo.Drawing
                                                RangeF.Convert(0.0f, 1.0f, last.Scale.Y, next.Scale.Y, progress));
 
             Keyframe current = new Keyframe(currentTick, currentOpacity,
-                currentPosition, currentRotation, currentScale);
+                new Vector2(currentPosition.X, currentPosition.Y), currentRotation, currentScale);
 
             return current;
         }

@@ -6,7 +6,7 @@ using System.Linq;
 namespace Orikivo.Drawing
 {
 
-    // used to help draw things
+    // used to help draw things, might be scrapped
     public class Pointer
     {
         public Pointer(int leftPadding = 0, int topPadding = 0, int? maxWidth = null, int? maxHeight = null)

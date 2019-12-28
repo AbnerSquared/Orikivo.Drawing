@@ -75,16 +75,18 @@ namespace Orikivo.Drawing
         {
             if (bmp == null)
                 return 0;
-            //Console.WriteLine("NonEmpty.Check");
+
+            Grid<Color> pixels = GraphicsUtils.GetBitmapPixels(bmp);
+
             int nonEmptyLen = 0;
 
-            for (int y = 0; y < bmp.Height; y++)
+            for (int y = 0; y < pixels.Height; y++)
             {
                 int xLen = 0;
 
-                for (int x = 0; x < bmp.Width; x++)
+                for (int x = 0; x < pixels.Width; x++)
                 {
-                    if (bmp.GetPixel(x, y).A == 0)
+                    if (pixels.GetValue(x, y).A == 0)
                         continue;
 
                     xLen = x + 1;
@@ -92,11 +94,8 @@ namespace Orikivo.Drawing
 
                 if (xLen > nonEmptyLen)
                     nonEmptyLen = xLen;
-
-                //Console.WriteLine($"LengthX: {xLen}\nNonEmpty.Replace: {(xLen > nonEmptyLen).ToString()}");
             }
 
-            //Console.WriteLine($"NonEmpty: {nonEmptyLen}");
             return nonEmptyLen;
         }
 

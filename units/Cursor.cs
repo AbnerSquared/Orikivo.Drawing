@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Orikivo.Drawing
 {
+    // used to help draw things, might be scrapped
     public struct Cursor
     {
         public Cursor(int x, int y, int seekLength = 1, int? maxWidth = null, int? maxHeight = null)
