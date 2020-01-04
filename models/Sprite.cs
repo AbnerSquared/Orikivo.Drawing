@@ -14,7 +14,7 @@ namespace Orikivo.Drawing
             Id = id;
             Path = url;
 
-            using (Bitmap source = GetSource())
+            using (Bitmap source = GetImage())
             {
                 Width = source.Width;
                 Height = source.Height;
@@ -40,7 +40,7 @@ namespace Orikivo.Drawing
         /// <summary>
         /// Returns the <see cref="Bitmap"/> specified by <see cref="Path"/>.
         /// </summary>
-        public Bitmap GetSource()
+        public Bitmap GetImage()
             => new Bitmap(Path);
     }
 }

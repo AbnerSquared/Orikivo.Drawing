@@ -10,7 +10,7 @@ using Encoder = System.Drawing.Imaging.Encoder;
 namespace Orikivo.Drawing
 {
 
-    public static class BitmapUtils
+    public static class BitmapHandler
     {
         internal static Bitmap Fill(Bitmap bmp, Color color) // FillAlpha: Fills only empty colors.
         {

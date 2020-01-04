@@ -102,7 +102,7 @@ namespace Orikivo.Drawing
                 int y = font.CharHeight * i.Row;
 
                 Rectangle crop = new Rectangle(x, y, font.CharWidth, font.CharHeight);
-                Bitmap tmp = BitmapUtils.Crop(bmp, crop);
+                Bitmap tmp = BitmapHandler.Crop(bmp, crop);
 
                 return tmp;
             }
@@ -124,7 +124,7 @@ namespace Orikivo.Drawing
             if (!font.IsMonospace && useNonEmptyWidth) // NOTE: I don't even think this is needed.
             {
                 // might be too taxing
-                return BitmapUtils.Crop(bmp, new Rectangle(0, 0, BitmapUtils.GetNonEmptyWidth(bmp), font.CharHeight));
+                return BitmapHandler.Crop(bmp, new Rectangle(0, 0, BitmapHandler.GetNonEmptyWidth(bmp), font.CharHeight));
             }
             
 
@@ -184,7 +184,8 @@ namespace Orikivo.Drawing
         // make .MaxHeight .MaxWidth .Width .Height
         // if Width is specified, the canvas will be that width regardless
         // if .MaxWidth is specified instead, the canvas can expand up to that width.
-
+        // TODO: Merge GetChars() and CreateText() together.
+        // TODO: Scrap AutoWidth, and simply use IsMonospace
         private TextBox CreateText(Dictionary<char, Bitmap> spriteMap, string content, FontFace font, Padding? textPadding = null, int? maxWidth = null, int? maxHeight = null, bool useNonEmptyWidth = true, bool extendOnOffset = false)
         {
             bool autoWidth = useNonEmptyWidth && !font.IsMonospace;
@@ -321,9 +322,9 @@ namespace Orikivo.Drawing
             Bitmap bmp = new Bitmap(text.BitmapWidth, text.BitmapHeight);
 
             if (options?.BackgroundColor.HasValue ?? false)
-                bmp = BitmapUtils.Fill(bmp, options.BackgroundColor.Value);
+                bmp = BitmapHandler.Fill(bmp, options.BackgroundColor.Value);
 
-            System.Drawing.Point pointer = new System.Drawing.Point(text.Padding.Left, text.Padding.Top);
+            Point pointer = new Point(text.Padding.Left, text.Padding.Top);
 
             int yOffset = 0; // the largest y offset in place.
 
@@ -385,67 +386,34 @@ namespace Orikivo.Drawing
 
             // recolor bitmap here, and handle outlines here.
 
-            bmp = BitmapUtils.SetColorMaps(bmp, BitmapUtils.CreateColorMaps((Color.White, color)));
+            bmp = BitmapHandler.SetColorMaps(bmp, BitmapHandler.CreateColorMaps((Color.White, color)));
             return bmp;
         }
 
-        //public void DrawStream() { }
-        //public void DrawOutline() { }
-        //public void DrawAndFillOutline() { }
-        //public void DrawText() { }
-        //public void DrawShadow() { } // Elevate
-        //public void DrawHttpImage() { }
-        //public void Recolor() { }
-
-        //public void SetSize(int width, int height)
-        //{
-            // simply sets the new image sizes to the specified width and height
-        //}
-
-        //public void SetSize(Vector2 scalar)
-        //{
-            // resizes the specified size to a new size based off of the values specified in the scalar.
-        //}
-
-        //private static int GetScalarLength(int length, float scalar)
-        //    => (int) Math.Floor(length * scalar);
-
-        public Bitmap CreateSolid(GammaColor color, int width, int height)
+        public Bitmap DrawSolid(GammaColor color, int width, int height)
         {
-            return BitmapUtils.Fill(new Bitmap(width, height, PixelFormat.Format32bppArgb), color);
+            return GraphicsUtils.CreateBitmap(new Grid<Color>(width, height, color).Values); //BitmapHandler.Fill(new Bitmap(width, height, PixelFormat.Format32bppArgb), color);
         }
 
         // blending between two colors.
         // THIS CAN BE DONE.
-        //public void CreateGradient(GammaColor from, GammaColor to, int width, int height, AngleF angle)
-        //{
-            
-            // 1.00f / width = 1 segment
-        //}
+        //public void DrawGradient(GammaColor from, GammaColor to, int width, int height, AngleF angle)
 
         // float is from 0.00f to 1.00f, where 0.50 is the midpoint of the specified angle.
-        //public void CreateGradient(Dictionary<float, GammaColor> colorKeyframes, int width, int height, AngleF angle)
-        //{
+        //public void DrawGradient(Dictionary<float, GammaColor> colorKeyframes, int width, int height, AngleF angle)
 
-        //}
-
-        //public void CreateGradient(GammaColorMap colors, int width, int height, AngleF angle)
-        //{
-
-        //}
+        //public void DrawGradient(GammaColorMap colors, int width, int height, AngleF angle)
         
-        //public void CreateLine(Point from, Point to, int thickness, GammaColor color)
-        //{
-            // creates an image with a line drawn from a point to another point using the specified thickness and color.
-        //}
+        //public void DrawLine(Point from, Point to, int thickness, GammaColor color)
 
-        public Bitmap DrawFillable(GammaColor background, GammaColor foreground, int width, int height, float progress, FillDirection direction = FillDirection.Right)
+        public Bitmap DrawFillable(GammaColor background, GammaColor foreground, int width, int height, float progress, AngleF angle)
         {
             float a = RangeF.Convert(0.0f, 1.0f, 0.0f, width, progress); // x fill
 
             // TODO: account for direction, using a 2D rotation matrix???
             Bitmap result = new Bitmap(width, height);
 
+            // TODO: Utilize Grid<Color> to create the fillable, due to the angle markers.
             using (Graphics g = Graphics.FromImage(result))
             {
                 int fillWidth = (int)Math.Floor(a);
@@ -470,62 +438,10 @@ namespace Orikivo.Drawing
             return result;
         }
 
-        //public void DrawFillable(GammaColor background, GammaColor foreground, int width, int height, float progress, AngleF angle)
-        //{
-
-        //} 
-
         // gets rid of all rendered objects
         public void Dispose()
         {
 
         }
-    }
-
-    public class Solid
-    {
-        public GammaColor Color { get; set; }
-        public Size Size { get; set; }
-    }
-
-    // generic PixelGraphics object.
-    public interface IDrawable
-    {
-
-    }
-
-    public class GradientKeyframe
-    {
-        // 0.00 to 1.00
-        public float Point { get; set; }
-
-        public GammaColor Value { get; set; }
-    }
-
-    public class Gradient
-    {
-        public Dictionary<float, GammaColor> ColorKeyframes { get; set; }
-        public Size Size { get; set; }
-        public float Angle { get; set; }
-    }
-
-    public class Fillable
-    {
-        public GammaColor Background { get; set; }
-        public GammaColor Foreground { get; set; }
-        public Size Size { get; set; }
-        public float Progress { get; set; }
-        public float Angle { get; set; }
-    }
-
-
-    // 0.00f to 360.0f
-    // the direction of the fill.
-    public enum FillDirection
-    {
-        Up = 90, // 90deg
-        Down = 270, // 270deg
-        Left = 180, // 180deg
-        Right = 0 // 0|360deg
     }
 }

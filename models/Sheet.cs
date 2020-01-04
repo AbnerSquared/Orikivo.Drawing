@@ -19,7 +19,7 @@ namespace Orikivo.Drawing
             CropHeight = cropHeight;
             CropWidth = cropWidth;
 
-            using (Bitmap source = GetSource())
+            using (Bitmap source = GetImage())
             {
                 if (source.Width % CropWidth != 0 || source.Height % CropHeight != 0)
                     throw new IndexOutOfRangeException("The crop specified does not completely crop the sheet.");
@@ -63,7 +63,7 @@ namespace Orikivo.Drawing
         /// <summary>
         /// Returns the image at the specified index.
         /// </summary>
-        public Bitmap GetBitmap(int index) // # of total crops
+        public Bitmap GetSprite(int index) // # of total crops
         {
             if (index > ColumnCount * RowCount)
                 throw new ArgumentOutOfRangeException();
@@ -76,13 +76,13 @@ namespace Orikivo.Drawing
                 index -= ColumnCount;
             }
 
-            return GetBitmap(index, column);
+            return GetSprite(index, column);
         }
 
         /// <summary>
         /// Returns the image at the specified row and column.
         /// </summary>
-        public Bitmap GetBitmap(int row, int column)
+        public Bitmap GetSprite(int row, int column)
         {
             if (row > RowCount || column > ColumnCount)
                 throw new ArgumentOutOfRangeException("The specified row or column is out of range.");
@@ -90,22 +90,22 @@ namespace Orikivo.Drawing
             SheetOverride crop = Overrides.FirstOrDefault(x => x.Row == row && x.Column == column) ?? SheetOverride.Empty;
 
             if (RowCount == 1 && ColumnCount == 1)
-                return GetSource();
+                return GetImage();
 
-            return BitmapUtils.Crop(Path, (CropWidth * (column - 1)) + crop.Offset.X, (CropHeight * (row - 1)) + crop.Offset.Y,
+            return BitmapHandler.Crop(Path, (CropWidth * (column - 1)) + crop.Offset.X, (CropHeight * (row - 1)) + crop.Offset.Y,
                 crop.Width ?? CropWidth, crop.Height ?? CropHeight);
         }
 
         /// <summary>
         /// Returns all of the images on the <see cref="Sheet"/> with their corresponding row and column.
         /// </summary>
-        public List<(Point Index, Bitmap Bitmap)> GetBitmaps()
+        public List<(Point Index, Bitmap Bitmap)> GetSprites()
         {
             List<(Point Index, Bitmap Bitmap)> bitmaps = new List<(Point, Bitmap)>();
 
             for (int x = 1; x <= ColumnCount; x++)
                 for (int y = 1; y <= RowCount; y++)
-                    bitmaps.Add((new Point(y, x), GetBitmap(y, x)));
+                    bitmaps.Add((new Point(y, x), GetSprite(y, x)));
 
             return bitmaps;
         }

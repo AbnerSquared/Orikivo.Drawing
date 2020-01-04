@@ -29,7 +29,7 @@ namespace Orikivo.Drawing
                         Values[y, x] = defaultValue;
         }
 
-        public T[,] Values { get; }
+        public T[,] Values { get; } // TODO: Maybe add support for T[][] (Jagged Arrays?)
 
         public int Width => Values.GetLength(1);
         public int Height => Values.GetLength(0);
@@ -42,12 +42,10 @@ namespace Orikivo.Drawing
 
         public Grid<TResult> Cast<TResult>()
         {
+            // TODO: Change how this method is handled, as it currently doesn't work as intended.
             Grid<TResult> result = new Grid<TResult>(Width, Height);
 
-            result.ForEachValue(delegate(int x, int y)
-            {
-                return GetValue(x, y).CastObject<TResult>();
-            });
+            result.ForEachValue((int x, int y) => GetValue(x, y).CastObject<TResult>());
 
             return result;
         }
@@ -63,14 +61,20 @@ namespace Orikivo.Drawing
         /// <summary>
         /// Returns the row of the existing <see cref="Grid{T}"/> by a specified row index.
         /// </summary>
-        public T[] GetRow(int y)
+        public T[] GetRow(int y) // IEnumerable<T>
         {
             T[] row = new T[Width];
 
             for (int x = 0; x < Width; x++)
-                row[x] = Values[y, x];
+                row[x] = Values[y, x]; // yield return Values[y, x]; TODO: Compare if T[] or IEnumerable<T> is better.
 
             return row;
+        }
+
+        public void SetRow(int y, T value)
+        {
+            for (int x = 0; x < Width; x++)
+                Values[y, x] = value;
         }
 
         /// <summary>
@@ -80,10 +84,16 @@ namespace Orikivo.Drawing
         {
             T[] column = new T[Height];
 
-            for (int y = 0; y < Height; x++)
+            for (int y = 0; y < Height; y++)
                 column[y] = Values[y, x];
 
             return column;
+        }
+
+        public void SetColumn(int x, T value)
+        {
+            for (int y = 0; y < Height; y++)
+                Values[y, x] = value;
         }
 
 
@@ -115,6 +125,14 @@ namespace Orikivo.Drawing
                 for (int x = 0; x < Width; x++)
                     Values[y, x] = value;
         }
+
+        /*
+        public void ForEachValue(Func<T> action)
+        {
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                    Values[y, x] = action.Invoke();
+        }*/
 
         public void ForEachValue(Func<int, int, T> action)
         {

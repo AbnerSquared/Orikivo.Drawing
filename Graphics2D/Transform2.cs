@@ -3,11 +3,11 @@
     /// <summary>
     /// A transform object within a 2D space.
     /// </summary>
-    public class FlatTransform
+    public class Transform2
     {
-        public static FlatTransform Default = new FlatTransform(Vector2.Zero, 0, Vector2.One);
+        public static Transform2 Default = new Transform2(Vector2.Zero, 0, Vector2.One);
 
-        public FlatTransform(Vector2 position, float rotation, Vector2? scale = null)
+        public Transform2(Vector2 position, float rotation, Vector2? scale = null)
         {
             Position = position;
             Rotation = rotation % 360;

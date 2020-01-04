@@ -53,8 +53,20 @@ namespace Orikivo.Drawing
 
         public DrawableConfig Config { get; set; }
 
+        public Border Border { get; set; }
+
         public Size Size => new Size(Viewport.Width + Padding.Width,
             Viewport.Height + Padding.Height);
+
+        public void SetBorder(GammaColor color, int width, BorderEdge edge = BorderEdge.Outside)
+        {
+            Border = new Border { Color = color, Width = width, FillEdge = edge };
+        } // LeftBorder, TopBorder, RightBorder, BottomBorder
+
+        public void ClearBorder()
+        {
+            Border = null;
+        }
 
         /// <summary>
         /// Sets the origin of the <see cref="Drawable"/> to the specified <see cref="OriginAnchor"/>.
@@ -132,7 +144,7 @@ namespace Orikivo.Drawing
                             {
                                 Rectangle cropRect = GraphicsUtils.ClampRectangle(Origin, Viewport, layer.Offset, bmp.Size);
 
-                                using (Bitmap crop = BitmapUtils.Crop(bmp, cropRect))
+                                using (Bitmap crop = BitmapHandler.Crop(bmp, cropRect))
                                     GraphicsUtils.ClipAndDrawImage(graphics, crop, layer.Position);
 
                                 continue;
@@ -144,7 +156,7 @@ namespace Orikivo.Drawing
                 }
             }
 
-            result = BitmapUtils.SetColorMaps(result, GammaColorMap.Default, Colors);
+            result = BitmapHandler.SetColorMaps(result, GammaColorMap.Default, Colors);
 
             if (Scale > ImageScale.Small)
                 result = GraphicsUtils.Scale(result, (int)Scale, (int)Scale);

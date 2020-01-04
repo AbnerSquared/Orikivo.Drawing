@@ -128,7 +128,7 @@ namespace Orikivo.Drawing
             return result;
         }
 
-        public static Bitmap ApplyTransform(Size viewport, Bitmap bmp, FlatTransform transform, float opacity = 1.0f)
+        public static Bitmap ApplyTransform(Size viewport, Bitmap bmp, Transform2 transform, float opacity = 1.0f)
         {
             Bitmap result = new Bitmap(viewport.Width, viewport.Height, PixelFormat.Format32bppArgb);
 
@@ -148,7 +148,7 @@ namespace Orikivo.Drawing
                                                                 position,
                                                                 edited.Size);
 
-                            using (Bitmap crop = BitmapUtils.Crop(edited, cropRect))
+                            using (Bitmap crop = BitmapHandler.Crop(edited, cropRect))
                                 ClipAndDrawImage(g, crop, position);
                         }
                         else
@@ -165,7 +165,7 @@ namespace Orikivo.Drawing
         }
 
 
-        public static Bitmap ApplyTransform(Bitmap bmp, FlatTransform transform, float opacity = 1.0f)
+        public static Bitmap ApplyTransform(Bitmap bmp, Transform2 transform, float opacity = 1.0f)
         {
             // SCALE
             using (Bitmap scaled = Scale(bmp, transform.Scale.X, transform.Scale.Y))

@@ -12,7 +12,12 @@ namespace Orikivo.Drawing
         private static float Wrap(float f)
             => f % 360.0f;
 
-        public static AngleF Zero => 0.0f;
+        public static readonly AngleF Zero = 0.0f;
+
+        public static readonly AngleF Up = 90.0f;
+        public static readonly AngleF Down = 270.0f;
+        public static readonly AngleF Left = 180.0f;
+        public static readonly AngleF Right = 0.0f;
         
         public AngleF(float f)
         {
