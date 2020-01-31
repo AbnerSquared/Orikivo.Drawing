@@ -42,7 +42,12 @@ namespace Orikivo.Drawing.Encoding
         public Quality Quality { get; set; } = Quality.Bpp8;
 
         public GifEncoder(Stream stream, Size size, int? repeatCount = null)
-            => new GifEncoder(stream, size.Width, size.Height, repeatCount);
+        {
+            _stream = stream;
+            _width = size.Width;
+            _height = size.Height;
+            _repeatCount = repeatCount;
+        }
 
         public GifEncoder(Stream stream, int? width = null, int? height = null, int? repeatCount = null)
         {
@@ -55,6 +60,9 @@ namespace Orikivo.Drawing.Encoding
 
         public void EncodeFrame(Image image, Point? offset = null, TimeSpan? frameLength = null)
         {
+            if (image.Width > ushort.MaxValue || image.Height > ushort.MaxValue)
+                throw new ArgumentException("The image specified cannot have a width or height of 65535.");
+
             Point imageOffset = offset ?? Point.Empty;
             // TODO: Handle out of bounds offset. (Refer to DrawableLayer.Build())
 
@@ -179,6 +187,8 @@ namespace Orikivo.Drawing.Encoding
             WriteByte(FILE_TRAILER); // closes
             _stream.Flush(); // pushes data
             Console.WriteLine("GIF encoded.");
+
+            _stream.Position = 0;
         }
     }
 }

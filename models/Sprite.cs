@@ -28,7 +28,7 @@ namespace Orikivo.Drawing
         public string Id { get; set; }
 
         /// <summary>
-        /// The local path that points to the <see cref="Image"/> referenced for this <see cref="Sprite"/>.
+        /// A local path that points to the <see cref="Image"/> referenced for this <see cref="Sprite"/>.
         /// </summary>
         [JsonProperty("path")]
         public string Path { get; }

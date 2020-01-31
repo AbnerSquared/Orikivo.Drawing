@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Point = System.Drawing.Point;
 
 namespace Orikivo.Drawing.Graphics3D
 {
     public class Camera
     {
-        public Camera(int width, int height, float fov, float near, float far, GammaColorMap palette)
+        public Camera(int width, int height, float fov, float near, float far, GammaPalette palette)
         {
             Width = width;
             Height = height;
@@ -19,7 +20,7 @@ namespace Orikivo.Drawing.Graphics3D
             BackgroundColor = palette[Gamma.Min];
         }
 
-        public GammaColorMap Palette { get; set; }
+        public GammaPalette Palette { get; set; }
 
         public GammaColor BackgroundColor { get; set; }
 
@@ -37,13 +38,13 @@ namespace Orikivo.Drawing.Graphics3D
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public Grid<GammaColor> GetScreen()
-            => new Grid<GammaColor>(Width, Height, BackgroundColor);
+        public Grid<Color> GetScreen()
+            => new Grid<Color>(Width, Height, BackgroundColor);
 
         public MatrixF GetProjector()
             => MatrixF.CreateProjector(Near, Far, Fov, Width / Height);
 
-        public bool Contains(System.Drawing.Point p)
+        public bool Contains(Point p)
             => Contains(p.X, p.Y);
 
         public bool Contains(int x, int y)
@@ -52,12 +53,12 @@ namespace Orikivo.Drawing.Graphics3D
                    RangeF.Contains(0, Height, y, true, false);
         }
 
-        public List<System.Drawing.Point> GetVisible(System.Drawing.Point a, System.Drawing.Point b)
+        public List<Point> GetVisible(Point a, Point b)
             => GetVisible(a.X, a.Y, b.X, b.Y);
 
-        public List<System.Drawing.Point> GetVisible(int x1, int y1, int x2, int y2)
+        public List<Point> GetVisible(int x1, int y1, int x2, int y2)
         {
-            List<System.Drawing.Point> points = new List<System.Drawing.Point>();
+            List<Point> points = new List<Point>();
             int x = 0;
             int y = 0;
 
@@ -80,13 +81,12 @@ namespace Orikivo.Drawing.Graphics3D
                 y = dx >= 0 ? y1 : y2;
                 endX = dx >= 0 ? x2 : x1;
 
-                //Console.WriteLine($"P({x}, {y})");
                 if (Contains(x, y))
-                    points.Add(new System.Drawing.Point(x, y));
+                    points.Add(new Point(x, y));
 
-                for (int i = 0; x < endX; i++)
+                while (x < endX)
                 {
-                    x += 1;
+                    x++;
 
                     if (px < 0)
                     {
@@ -98,9 +98,8 @@ namespace Orikivo.Drawing.Graphics3D
                         px += 2 * (rise - run);
                     }
 
-                    //Console.WriteLine($"P({x}, {y})");
                     if (Contains(x, y))
-                        points.Add(new System.Drawing.Point(x, y));
+                        points.Add(new Point(x, y));
                 }
             }
             else
@@ -110,11 +109,11 @@ namespace Orikivo.Drawing.Graphics3D
                 endY = dy >= 0 ? y2 : y1;
 
                 if (Contains(x, y))
-                    points.Add(new System.Drawing.Point(x, y));
+                    points.Add(new Point(x, y));
 
-                for (int i = 0; y < endY; i++)
+                while (y < endY)
                 {
-                    y += 1;
+                    y++;
 
                     if (py <= 0)
                     {
@@ -126,22 +125,21 @@ namespace Orikivo.Drawing.Graphics3D
                         py += 2 * (run - rise);
                     }
 
-                    //Console.WriteLine($"P({x}, {y})");
                     if (Contains(x, y))
-                        points.Add(new System.Drawing.Point(x, y));
+                        points.Add(new Point(x, y));
                 }
             }
 
             return points;
         }
 
-        public List<System.Drawing.Point> GetVisible(Triangle t)
+        public List<Point> GetVisible(Triangle t)
         {
-            System.Drawing.Point a = new System.Drawing.Point((int)MathF.Round(t.Points[0].X), (int)MathF.Round(t.Points[0].Y));
-            System.Drawing.Point b = new System.Drawing.Point((int)MathF.Round(t.Points[1].X), (int)MathF.Round(t.Points[1].Y));
-            System.Drawing.Point c = new System.Drawing.Point((int)MathF.Round(t.Points[2].X), (int)MathF.Round(t.Points[2].Y));
+            Point a = new Point((int)MathF.Round(t.Points[0].X), (int)MathF.Round(t.Points[0].Y));
+            Point b = new Point((int)MathF.Round(t.Points[1].X), (int)MathF.Round(t.Points[1].Y));
+            Point c = new Point((int)MathF.Round(t.Points[2].X), (int)MathF.Round(t.Points[2].Y));
 
-            List<System.Drawing.Point> points = new List<System.Drawing.Point>();
+            List<Point> points = new List<Point>();
 
             points.AddRange(GetVisible(a.X, a.Y, b.X, b.Y));
             points.AddRange(GetVisible(b.X, b.Y, c.X, c.Y));

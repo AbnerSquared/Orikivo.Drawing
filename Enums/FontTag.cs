@@ -20,12 +20,6 @@
         /// <summary>
         /// Marks a <see cref="FontFace"/> to support subscript and superscript text.
         /// </summary>
-        SubscriptSupported = 3,
-
-        /// <summary>
-        /// Marks a <see cref="FontFace"/> to be required as functional, as it is a root font.
-        /// </summary>
-        Required = 4 // NOTE: This might be set in PixelGraphics, or anything so, using FontDictionary + orikos.json
-            // This way, the required fonts are hardcoded.
+        SubscriptSupported = 3
     }
 }

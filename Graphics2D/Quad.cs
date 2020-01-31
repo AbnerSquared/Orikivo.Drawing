@@ -51,10 +51,10 @@
         /// </summary>
         public Quad GetBoundingBox()
         {
-            float xMin = CalculatorF.Min(TopLeft.X, TopRight.X, BottomLeft.X, BottomRight.X);
-            float xMax = CalculatorF.Max(TopLeft.X, TopRight.X, BottomLeft.X, BottomRight.X);
-            float yMin = CalculatorF.Min(TopLeft.Y, TopRight.Y, BottomLeft.Y, BottomRight.Y);
-            float yMax = CalculatorF.Max(TopLeft.Y, TopRight.Y, BottomLeft.Y, BottomRight.Y);
+            float xMin = CalcF.Min(TopLeft.X, TopRight.X, BottomLeft.X, BottomRight.X);
+            float xMax = CalcF.Max(TopLeft.X, TopRight.X, BottomLeft.X, BottomRight.X);
+            float yMin = CalcF.Min(TopLeft.Y, TopRight.Y, BottomLeft.Y, BottomRight.Y);
+            float yMax = CalcF.Max(TopLeft.Y, TopRight.Y, BottomLeft.Y, BottomRight.Y);
 
             // Might need to be reversed, depending on right-hand rule
             Vector2 topLeft = new Vector2(xMin, yMin);

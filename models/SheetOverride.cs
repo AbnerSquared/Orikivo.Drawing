@@ -3,17 +3,21 @@ using System.Drawing;
 
 namespace Orikivo.Drawing
 {
+    /// <summary>
+    /// Represents a custom <see cref="Size"/> and <see cref="Point"/> for a <see cref="Sprite"/> within a <see cref="Sheet"/>.
+    /// </summary>
     public class SheetOverride
     {
         public static SheetOverride Empty = new SheetOverride(0, 0);
 
         [JsonConstructor]
-        public SheetOverride(int row, int column, Point? offset = null, int? width = null,
+        public SheetOverride(int row, int column, int? offsetX = null, int? offsetY = null, int? width = null,
             int? height = null)
         {
             Row = row;
             Column = column;
-            Offset = offset ?? Point.Empty;
+            OffsetX = offsetX.GetValueOrDefault(0);
+            OffsetY = offsetY.GetValueOrDefault(0);
             Width = width;
             Height = height;
         }
@@ -24,8 +28,13 @@ namespace Orikivo.Drawing
         [JsonProperty("col")]
         public int Column { get; }
 
-        [JsonProperty("offset")]
-        public Point Offset { get; }
+        [JsonProperty("offset_x")]
+        public int OffsetX { get; }
+
+        [JsonProperty("offset_y")]
+        public int OffsetY { get; }
+
+        public Point Offset => new Point(OffsetX, OffsetY);
 
         [JsonProperty("width")]
         public int? Width { get; }

@@ -62,7 +62,7 @@ namespace Orikivo.Drawing.Graphics2D
 
     }
 
-    public static class CalculatorF
+    public static class CalcF
     {
         // AlmostEquals(float a, float b, float difference)
         // AlmostAllEquals(float a, float b, int maxMismatches)
@@ -73,6 +73,9 @@ namespace Orikivo.Drawing.Graphics2D
         public const float Pi = 3.14159274f;
         public const float E = 2.71828175f;
         public const float Degree = Pi / 180.0f;
+
+        public static float Hypotenuse(float opposite, float adjacent)
+            => MathF.Sqrt((opposite * opposite) + (adjacent * adjacent));
 
         public static IEnumerable<float> Ceiling(IEnumerable<float> set)
         {

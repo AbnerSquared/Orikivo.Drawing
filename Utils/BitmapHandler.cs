@@ -21,6 +21,9 @@ namespace Orikivo.Drawing
 
             return bmp;
         }
+
+        public static bool IsEmpty(Bitmap bmp)
+            => GraphicsUtils.GetPixels(bmp).All(x => x.A == 0);
         public static ColorMap[] CreateColorMaps(Color[] fromColors, Color[] toColors)
         {
             if (fromColors == null || toColors == null)
@@ -51,10 +54,10 @@ namespace Orikivo.Drawing
 
         // remember that a discord image container has a border radius of 3px
         // to prevent pixels from looking wonky, add a minimum padding of 4px
-        public static Bitmap SetColorMaps(Bitmap bmp, GammaColorMap from, GammaColorMap to)
-            => SetColorMaps(bmp, CreateColorMaps(from.Values.Select(x => (Color)x).ToArray(), to.Values.Select(x => (Color)x).ToArray()));
+        public static Bitmap ReplacePalette(Bitmap bmp, GammaPalette from, GammaPalette to)
+            => ReplacePalette(bmp, CreateColorMaps(from.Values.Select(x => (Color)x).ToArray(), to.Values.Select(x => (Color)x).ToArray()));
 
-        public static Bitmap SetColorMaps(Bitmap bmp, ColorMap[] mapTable)
+        public static Bitmap ReplacePalette(Bitmap bmp, ColorMap[] mapTable)
         {
             Bitmap canvas = new Bitmap(bmp.Width, bmp.Height);
 
@@ -76,7 +79,7 @@ namespace Orikivo.Drawing
             if (bmp == null)
                 return 0;
 
-            Grid<Color> pixels = GraphicsUtils.GetBitmapPixels(bmp);
+            Grid<Color> pixels = GraphicsUtils.GetPixels(bmp);
 
             int nonEmptyLen = 0;
 
@@ -177,7 +180,7 @@ namespace Orikivo.Drawing
             return bmp;
         }
 
-        private static ImageCodecInfo GetCodecInfo(ImageFormat format)
+        private static ImageCodecInfo GetImageCodec(ImageFormat format)
         {
             ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
             foreach (ImageCodecInfo codec in codecs)
@@ -208,7 +211,7 @@ namespace Orikivo.Drawing
             return tmp;
         }
 
-        public static void Save(Bitmap bmp, string path, ImageFormat format)
+        public static void Save(Image bmp, string path, ImageFormat format)
         {
             using (bmp)
             {
@@ -217,7 +220,7 @@ namespace Orikivo.Drawing
                 EncoderParameters parameters = new EncoderParameters(args.Length);
                 for (int i = 0; i < args.Length; i++)
                     parameters.Param[i] = args[i];
-                bmp.Save(path, GetCodecInfo(format), parameters); // bmp can be disposed, as it's simply being stored
+                bmp.Save(path, GetImageCodec(format), parameters); // bmp can be disposed, as it's simply being stored
             }
         }
     }

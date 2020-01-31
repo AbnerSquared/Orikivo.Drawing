@@ -47,9 +47,9 @@ namespace Orikivo.Drawing
         protected List<DrawableLayer> InternalLayers { get; } = new List<DrawableLayer>();
 
         /// <summary>
-        /// The <see cref="GammaColorMap"/> palette that will be used when using <see cref="Build"/>.
+        /// The <see cref="GammaPalette"/> that will be applied when using <see cref="Build"/>.
         /// </summary>
-        public GammaColorMap Colors { get; set; } = GammaColorMap.Default;
+        public GammaPalette Palette { get; set; } = GammaPalette.Default;
 
         public DrawableConfig Config { get; set; }
 
@@ -60,7 +60,7 @@ namespace Orikivo.Drawing
 
         public void SetBorder(GammaColor color, int width, BorderEdge edge = BorderEdge.Outside)
         {
-            Border = new Border { Color = color, Width = width, FillEdge = edge };
+            Border = new Border { Color = color, Width = width, Edge = edge };
         } // LeftBorder, TopBorder, RightBorder, BottomBorder
 
         public void ClearBorder()
@@ -75,6 +75,16 @@ namespace Orikivo.Drawing
         public void SetOrigin(OriginAnchor anchor)
         {
             Origin = OriginUtils.GetOrigin(Viewport, anchor);
+        }
+
+        public void SetOrigin(int x, int y)
+        {
+            Origin = new Point(x, y);
+        }
+
+        public void SetOrigin(Point origin)
+        {
+            Origin = origin;
         }
 
         /// <summary>
@@ -156,7 +166,7 @@ namespace Orikivo.Drawing
                 }
             }
 
-            result = BitmapHandler.SetColorMaps(result, GammaColorMap.Default, Colors);
+            result = BitmapHandler.ReplacePalette(result, GammaPalette.Default, Palette);
 
             if (Scale > ImageScale.Small)
                 result = GraphicsUtils.Scale(result, (int)Scale, (int)Scale);
@@ -166,7 +176,7 @@ namespace Orikivo.Drawing
             return result;
         }
 
-        public Bitmap DisposeBuild()
+        public Bitmap BuildAndDispose()
         {
             Bitmap bmp = Build();
             Dispose();

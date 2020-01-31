@@ -13,8 +13,8 @@ namespace Orikivo.Drawing.Graphics2D
 
             angle = angle % 360.00f;
 
-            Vector2 b = new Vector2(a.X + (length * MathF.Cos(CalculatorF.Radians(angle))),
-                a.Y + (length * MathF.Sin(CalculatorF.Radians(angle))));
+            Vector2 b = new Vector2(a.X + (length * MathF.Cos(CalcF.Radians(angle))),
+                a.Y + (length * MathF.Sin(CalcF.Radians(angle))));
 
             A = a;
             B = b;
@@ -41,6 +41,6 @@ namespace Orikivo.Drawing.Graphics2D
             set => Points[1] = value;
         }
 
-        public float Length => CalculatorF.Distance(A, B);
+        public float Length => CalcF.Distance(A, B);
     }
 }

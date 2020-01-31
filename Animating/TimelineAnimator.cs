@@ -26,9 +26,13 @@ namespace Orikivo.Drawing
                     // compile layer, draw to current frame.
                     for (int i = 0; i < Layers.Count; i++)
                     {
+                        if (Layers[i].EndTick < t || Layers[i].StartTick > t)
+                            continue;
+
                         Keyframe keyframe = Layers[i].GetLayerKeyframe(t);
-                        Bitmap layer = GraphicsUtils.ApplyTransform(Viewport, Layers[i].Image, keyframe.Transform, keyframe.Opacity);
-                        GraphicsUtils.ClipAndDrawImage(g, layer, Point.Empty);
+
+                        using (Bitmap layer = GraphicsUtils.Transform(Viewport, Layers[i].Image, keyframe.Transform, keyframe.Opacity))
+                            GraphicsUtils.ClipAndDrawImage(g, layer, Point.Empty);
                     }
                 }
 
@@ -46,18 +50,18 @@ namespace Orikivo.Drawing
             List<Frame> frames = CompileFrames();
 
             MemoryStream animation = new MemoryStream();
-            using (GifEncoder encoder = new GifEncoder(animation, Viewport))
+            using (GifEncoder encoder = new GifEncoder(animation, Viewport.Width, Viewport.Height))
             {
                 encoder.FrameLength = frameLength;
                 encoder.Quality = quality;
 
                 foreach (Frame frame in frames)
                 {
-                    encoder.EncodeFrame(frame.Image, frameLength: frame.Length);
+                    using (frame)
+                        encoder.EncodeFrame(frame.Image, frameLength: frame.Length);
                 }
             }
-            animation.Position = 0;
-
+            //animation.Position = 0;
             return animation;
         }
 

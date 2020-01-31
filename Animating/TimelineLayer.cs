@@ -28,7 +28,7 @@ namespace Orikivo.Drawing
 
         private Keyframe GetLastKeyframe(long currentTick)
         {
-            return currentTick > StartTick ? 
+            return currentTick > StartTick && Keyframes.Where(x => x.Tick < currentTick).Count() > 0 ? 
                 Keyframes.Where(x => x.Tick < currentTick)
                 .OrderBy(x => Math.Abs(x.Tick - currentTick))
                 .First()
@@ -43,11 +43,13 @@ namespace Orikivo.Drawing
         }
 
         public Keyframe GetLayerKeyframe(long currentTick)
-            => GetLayerKeyframe(GetLastKeyframe(currentTick), GetNextKeyframe(currentTick), currentTick);
+            => Keyframes.Count > 0 ?
+                GetLayerKeyframe(GetLastKeyframe(currentTick), GetNextKeyframe(currentTick), currentTick)
+                : InitialKeyframe;
 
         private Keyframe GetLayerKeyframe(Keyframe last, Keyframe next, long currentTick)
         {
-            float progress = RangeF.Convert(StartTick, EndTick, 0.0f, 1.0f, currentTick);
+            float progress = RangeF.Convert(last.Tick, next.Tick, 0.0f, 1.0f, currentTick);
 
             float currentOpacity = RangeF.Convert(0.0f, 1.0f, last.Opacity, next.Opacity, progress);
             
@@ -63,6 +65,8 @@ namespace Orikivo.Drawing
 
             Keyframe current = new Keyframe(currentTick, currentOpacity,
                 new Vector2(currentPosition.X, currentPosition.Y), currentRotation, currentScale);
+
+            Console.WriteLine($"{progress}%: TICK:{currentTick} LAST_TICK:{last.Tick} NEXT_TICK:{next.Tick} OPACITY:{currentOpacity} ROT:{currentRotation} SCALE_X:{currentScale.X} SCALE_Y:{currentScale.Y}");
 
             return current;
         }

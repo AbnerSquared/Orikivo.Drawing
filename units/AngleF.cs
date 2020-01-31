@@ -37,8 +37,8 @@ namespace Orikivo.Drawing
 
         public float Radians
         {
-            get => CalculatorF.Radians(Degrees);
-            set => Degrees = CalculatorF.Degrees(value);
+            get => CalcF.Radians(Degrees);
+            set => Degrees = CalcF.Degrees(value);
         }
 
         public override bool Equals(object obj)

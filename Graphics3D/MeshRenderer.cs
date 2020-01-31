@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace Orikivo.Drawing.Graphics3D
 {
@@ -11,7 +12,7 @@ namespace Orikivo.Drawing.Graphics3D
             Objects = new List<Model>();
         }
 
-        public MeshRenderer(int width, int height, float fov, float near, float far, GammaColorMap palette, Rasterizer rasterizer)
+        public MeshRenderer(int width, int height, float fov, float near, float far, GammaPalette palette, Rasterizer rasterizer)
         {
             Camera = new Camera(width, height, fov, near, far, palette);
             Objects = new List<Model>();
@@ -22,10 +23,10 @@ namespace Orikivo.Drawing.Graphics3D
         public Rasterizer Rasterizer { get; }
         public List<Model> Objects { get; set; }
 
-        public List<Grid<GammaColor>> Animate(long ticks, Model model, Vector3? position = null,
+        public List<Grid<Color>> Animate(long ticks, Model model, Vector3? position = null,
             Vector3? rotation = null, Vector3? velocity = null)
         {
-            List<Grid<GammaColor>> frames = new List<Grid<GammaColor>>();
+            List<Grid<Color>> frames = new List<Grid<Color>>();
 
             model.Transform.Position.Offset(position.GetValueOrDefault(Vector3.Zero));
             Vector3 pos = Vector3.Zero;
@@ -45,13 +46,13 @@ namespace Orikivo.Drawing.Graphics3D
             return frames;
         }
 
-        public Grid<GammaColor> Render(Mesh mesh, Transform transform, long tick = 0)
+        public Grid<Color> Render(Mesh mesh, Transform transform, long tick = 0)
             => Render(new Model(mesh, transform), tick);
 
-        public Grid<GammaColor> Render(Mesh mesh, Vector3 position, Vector3 rotation, long tick = 0)
+        public Grid<Color> Render(Mesh mesh, Vector3 position, Vector3 rotation, long tick = 0)
             => Render(new Model(mesh, new Transform(position, rotation)), tick);
 
-        public Grid<GammaColor> Render(Model model, long tick = 0)
+        public Grid<Color> Render(Model model, long tick = 0)
         {
             GammaPen pen = new GammaPen(Camera.Palette[Gamma.Max]);
             // Console.WriteLine($"Tick {tick}:\nRotation: {model.Transform.Rotation.ToString()} Position: {model.Transform.Position.ToString()}");

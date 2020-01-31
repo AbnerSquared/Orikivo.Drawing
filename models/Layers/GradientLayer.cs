@@ -19,13 +19,15 @@ namespace Orikivo.Drawing
             return Markers.OrderBy(x => x.Key).First().Value;
         }
 
-        private GammaColor GetColorAtPoint(float point)
+        private GammaColor GetColorAtPoint(float point, GradientColorHandling colorHandling = GradientColorHandling.Blend)
         {
             IEnumerable<float> last = Markers.Keys.Where(x => x < point);
-            float? lastClosest = last.Count() > 0 ? last.OrderBy(x => MathF.Abs(point - x)).First() : (float?) null;
+            float? lastClosest = last.Count() > 0 ? last
+                .OrderBy(x => MathF.Abs(point - x)).First() : (float?) null;
 
             IEnumerable<float> next = Markers.Keys.Where(x => x >= point);
-            float? nextClosest = next.Count() > 0 ? next.OrderBy(x => MathF.Abs(point - x)).First() : (float?) null;
+            float? nextClosest = next.Count() > 0 ? next
+                .OrderBy(x => MathF.Abs(point - x)).First() : (float?) null;
 
             if (lastClosest == null && nextClosest == null)
                 throw new Exception("There are no markers specified within the gradient to draw.");
@@ -58,7 +60,7 @@ namespace Orikivo.Drawing
 
                 pixels.SetColumn(i, GetColorAtPoint(point));
 
-                Color f = pixels.GetColumn(i)[0];
+                //Color f = pixels.GetColumn(i)[0];
                 //Console.WriteLine($"Column :: {f.A}, {f.R}, {f.G}, {f.B}");
             }
 
@@ -67,6 +69,6 @@ namespace Orikivo.Drawing
         }
 
         protected override Bitmap GetBaseImage()
-            => GraphicsUtils.CreateBitmap(GetPixels().Values);
+            => GraphicsUtils.CreateRgbBitmap(GetPixels().Values);
     }
 }

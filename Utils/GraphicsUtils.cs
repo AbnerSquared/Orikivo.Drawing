@@ -7,15 +7,11 @@ using Orikivo.Drawing.Graphics3D;
 using System.Drawing.Drawing2D;
 using static System.MathF;
 using Orikivo.Drawing.Graphics2D;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Orikivo.Drawing
 {
-
-    public enum DegreeMode // for an extensive Math class
-    {
-        Radians = 1,
-        Degrees = 2
-    }
     public static class GraphicsUtils
     {
         private static readonly Size Bounds16_9 = new Size(400, 225); // 16:9
@@ -44,26 +40,43 @@ namespace Orikivo.Drawing
             float c1 = oldHeight;
             float c2 = oldWidth;
 
-            float a1 = c1 * Sin(angle.Radians) / Sin(gamma.Radians);
-            float b1 = c1 * Sin(beta.Radians) / Sin(gamma.Radians);
-            float a2 = c2 * Sin(angle.Radians) / Sin(gamma.Radians);
-            float b2 = c2 * Sin(beta.Radians) / Sin(gamma.Radians);
+            float a1 = Abs(c1 * Sin(angle.Radians) / Sin(gamma.Radians));
+            float b1 = Abs(c1 * Sin(beta.Radians) / Sin(gamma.Radians));
+            float a2 = Abs(c2 * Sin(angle.Radians) / Sin(gamma.Radians));
+            float b2 = Abs(c2 * Sin(beta.Radians) / Sin(gamma.Radians));
 
-            int width = (int)Floor(b2 + a1);
-            int height = (int)Floor(b1 + a2);
+            int width = (int)Round(b2 + a1);
+            int height = (int)Round(b1 + a2);
+
+            StringBuilder read = new StringBuilder();
+
+            read.AppendLine($"OLD_HEIGHT:{c1} => {a1} + {b2}");
+            read.AppendLine($"OLD_WIDTH:{c2} => {b1} + {a2}");
+
+            Console.WriteLine(read.ToString());
+
 
             return new Size(width, height);
         }
 
-        public static Bitmap Rotate(Bitmap bmp, AngleF angle)
+        public static List<Point> GetBounds(Bitmap bmp)
+        {
+            Grid<bool> pixels = GetBooleanPixels(bmp); // a simple 1 or 0 image
+            throw new NotImplementedException();
+        }
+
+        public static Bitmap Rotate(Bitmap bmp, AngleF angle, Point? axis = null)
         {
             Size rot = GetRotationBounds(bmp.Width, bmp.Height, angle);
             Bitmap rotated = new Bitmap(rot.Width, rot.Height);
             using (Graphics g = Graphics.FromImage(rotated))
             {
-                g.TranslateTransform(rotated.Width / 2, rotated.Height / 2);
+
+                axis ??= new Point(rot.Width / 2, rot.Height / 2);
+                // the initial translate transform is top left of the image.
+                g.TranslateTransform(axis.Value.X, axis.Value.Y);
                 g.RotateTransform(angle);
-                g.TranslateTransform(-(rotated.Width / 2), -(rotated.Height / 2));
+                g.TranslateTransform(-axis.Value.X, -axis.Value.Y);
                 g.DrawImage(bmp, new Point(
                     (rot.Width - bmp.Width) / 2,
                     (rot.Height - bmp.Height) / 2));
@@ -72,7 +85,13 @@ namespace Orikivo.Drawing
             return rotated;
         }
 
-        public static Bitmap Resize(Bitmap bmp, int width, int height)
+        public static Bitmap Rotate(Bitmap bmp, AngleF angle, OriginAnchor axis)
+        {
+            Size rot = GetRotationBounds(bmp.Width, bmp.Height, angle);
+            return Rotate(bmp, angle, OriginUtils.GetOrigin(rot, axis));
+        }
+
+        public static Bitmap SetSize(Bitmap bmp, int width, int height)
         {
             Rectangle destination = new Rectangle(0, 0, width, height);
             Bitmap result = new Bitmap(width, height);
@@ -86,7 +105,7 @@ namespace Orikivo.Drawing
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.SmoothingMode = SmoothingMode.None;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
+                // might be over the top
                 using (ImageAttributes wraps = new ImageAttributes())
                 {
                     wraps.SetWrapMode(WrapMode.TileFlipXY);
@@ -98,9 +117,9 @@ namespace Orikivo.Drawing
         }
 
         public static Bitmap Scale(Bitmap bmp, float widthScale, float heightScale)
-            => Resize(bmp,
-                (int)Floor(bmp.Width * widthScale),
-                (int)Floor(bmp.Height * heightScale));
+            => SetSize(bmp,
+                (int)Round(bmp.Width * widthScale),
+                (int)Round(bmp.Height * heightScale));
 
         public static Bitmap SetOpacity(Bitmap bmp, float opacity)
         {
@@ -128,20 +147,22 @@ namespace Orikivo.Drawing
             return result;
         }
 
-        public static Bitmap ApplyTransform(Size viewport, Bitmap bmp, Transform2 transform, float opacity = 1.0f)
+        public static Bitmap Transform(Size viewport, Bitmap bmp, ImageTransform transform, float opacity = 1.0f)
         {
             Bitmap result = new Bitmap(viewport.Width, viewport.Height, PixelFormat.Format32bppArgb);
 
             using (Graphics g = Graphics.FromImage(result))
             {
-                using (Bitmap edited = ApplyTransform(bmp, transform, opacity))
+                using (Bitmap edited = Transform(bmp, transform, opacity))
                 {
+                    Size rot = GetRotationBounds(bmp.Width, bmp.Height, transform.Rotation);
+
                     // POSITION
-                    Point position = Point.Truncate(new PointF(transform.Position.X, transform.Position.Y));
+                    Point position = Point.Truncate(new PointF(transform.Position.X - ((rot.Width - bmp.Width) / 2), transform.Position.Y - ((rot.Height - bmp.Height) / 2)));
                     if (position.X > viewport.Width && position.Y > viewport.Height)
                     {
-                        if (position.X < 0 || position.X + edited.Width > viewport.Width ||
-                            position.Y < 0 || position.Y + edited.Height > viewport.Height)
+                        if (position.X < 0 || position.X + (edited.Width) > viewport.Width ||
+                            position.Y < 0 || position.Y + (edited.Height) > viewport.Height)
                         {
                             Rectangle cropRect = ClampRectangle(Point.Empty,
                                                                 viewport,
@@ -165,7 +186,7 @@ namespace Orikivo.Drawing
         }
 
 
-        public static Bitmap ApplyTransform(Bitmap bmp, Transform2 transform, float opacity = 1.0f)
+        public static Bitmap Transform(Bitmap bmp, ImageTransform transform, float opacity = 1.0f)
         {
             // SCALE
             using (Bitmap scaled = Scale(bmp, transform.Scale.X, transform.Scale.Y))
@@ -174,20 +195,61 @@ namespace Orikivo.Drawing
                 using (Bitmap rotated = Rotate(scaled, transform.Rotation))
                 {
                     // OPACITY
-                    using (Bitmap alpha = SetOpacity(rotated, opacity))
-                    {
-                        return alpha;
-                    }
+                    return SetOpacity(rotated, opacity); // dont dispose
                 }
             }
         }
-        public static Bitmap CreateBitmap(Color color, int width, int height)
-            => CreateBitmap(new Grid<Color>(width, height, color).Values);
+        public static Bitmap CreateRgbBitmap(Color color, int width, int height)
+            => CreateRgbBitmap(new Grid<Color>(width, height, color).Values);
 
-        public static Bitmap CreateBitmap(Grid<GammaColor> colors)
-            => CreateBitmap(colors.Cast<Color>().Values);
+        public static Bitmap CreateRgbBitmap(Grid<GammaColor> colors)
+            => CreateRgbBitmap(colors.Cast<Color>().Values);
 
-        public static Bitmap CreateBitmap(Color[,] colors)
+        public static Bitmap CreateArgbBitmap(Color[,] colors)
+        {
+            int width = colors.GetLength(1);
+            int height = colors.GetLength(0);
+
+            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            unsafe
+            {
+                BitmapData source = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, bmp.PixelFormat);
+                int bitsPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat) / 8;
+                int pixelHeight = source.Height;
+                int byteWidth = source.Width * bitsPerPixel; // is == width
+                byte* ptr = (byte*)source.Scan0;
+
+                // NOTE: a for statement, all done at once.
+                Parallel.For(0, pixelHeight, y =>
+                {
+                    byte* row = ptr + (y * source.Stride);
+                    for (int x = 0; x < byteWidth; x += bitsPerPixel)
+                    {
+                        Color color = colors[y, x / bitsPerPixel];
+
+                        // A
+                        row[x + 3] = color.A;
+
+                        // R
+                        row[x + 2] = color.R;
+
+                        // G
+                        row[x + 1] = color.G;
+
+                        // B
+                        row[x] = color.B;
+                    }
+                });
+
+                bmp.UnlockBits(source);
+            }
+
+            return bmp;
+        }
+
+
+        public static Bitmap CreateRgbBitmap(Color[,] colors)
         {
             int width = colors.GetLength(1);
             int height = colors.GetLength(0);
@@ -206,7 +268,7 @@ namespace Orikivo.Drawing
                 Parallel.For(0, pixelHeight, y =>
                 {
                     byte* row = ptr + (y * source.Stride);
-                    for (int x = 0; x < byteWidth; x = x + bitsPerPixel)
+                    for (int x = 0; x < byteWidth; x += bitsPerPixel)
                     {
                         Color color = colors[y, x / bitsPerPixel];
 
@@ -230,7 +292,7 @@ namespace Orikivo.Drawing
             return bmp;
         }
 
-        public static Bitmap ForceColors(Bitmap bmp, GammaColorMap colors)
+        public static Bitmap SetPalette(Bitmap bmp, GammaPalette colors)
         {
             unsafe
             {
@@ -244,7 +306,7 @@ namespace Orikivo.Drawing
                 Parallel.For(0, pixelHeight, y =>
                 {
                     byte* row = ptr + (y * source.Stride);
-                    for (int x = 0; x < byteWidth; x = x + bitsPerPixel)
+                    for (int x = 0; x < byteWidth; x += bitsPerPixel)
                     {
                         GammaColor color = new GammaColor(row[x + 2], row[x + 1], row[x], row[x + 3]);
                         Color forcedColor = GammaColor.ClosestMatch(color, colors);
@@ -269,7 +331,7 @@ namespace Orikivo.Drawing
             return bmp;
         }
 
-        public static Grid<Color> GetBitmapPixels(Bitmap bmp)
+        public static Grid<Color> GetPixels(Bitmap bmp)
         {
             Grid<Color> pixels = new Grid<Color>(bmp.Width, bmp.Height, Color.Empty);
 
@@ -285,7 +347,7 @@ namespace Orikivo.Drawing
                 Parallel.For(0, pixelHeight, y =>
                 {
                     byte* row = ptr + (y * source.Stride);
-                    for (int x = 0; x < byteWidth; x = x + bitsPerPixel)
+                    for (int x = 0; x < byteWidth; x += bitsPerPixel)
                     {
                         Color color = new GammaColor(row[x + 2], row[x + 1], row[x], row[x + 3]);
 
@@ -299,31 +361,57 @@ namespace Orikivo.Drawing
             return pixels;
         }
 
-        // This converts every single pixel on this image to the colors specified.
-        // Why not just do a simple force create color map
-        // from to
-        private static byte[] GetBpp8Bytes(byte[] bytes, int width, int height, GammaColorMap colors, ref int stride)
+        // 1 if there is a value other than transparent, 0 otherwise
+        public static Grid<Color> GetBinaryPixels(Bitmap bmp)
         {
-            byte[] bpp8 = new byte[width * height];
-            for (int y = 0; y < height; y++)
-            {
-                int input = y * stride;
-                int output = y * width;
+            Grid<Color> pixels = new Grid<Color>(bmp.Width, bmp.Height, Color.Transparent);
 
-                for (int x = 0; x < width; x++)
+            unsafe
+            {
+                BitmapData source = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
+                int bitsPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat) / 8;
+                int pixelHeight = source.Height;
+                int byteWidth = source.Width * bitsPerPixel; // is == width
+                byte* ptr = (byte*)source.Scan0;
+
+                // NOTE: a for statement, all done at once.
+                Parallel.For(0, pixelHeight, y =>
                 {
-                    byte r = bytes[input + 2];
-                    byte g = bytes[input + 1];
-                    byte b = bytes[input];
-                    GammaColor color = new GammaColor(r, g, b);
-                    bpp8[output] = (byte) GammaColor.ClosestMatchAt(color, colors);
-                    input += 4;
-                    output++;
-                }
+                    byte* row = ptr + (y * source.Stride);
+                    for (int x = 0; x < byteWidth; x += bitsPerPixel)
+                        pixels.SetValue(row[x + 3] > 0 ? Color.Black : Color.White, x / bitsPerPixel, y);
+                });
+
+                bmp.UnlockBits(source);
             }
 
-            stride = width;
-            return bpp8;
+            return pixels;
+        }
+
+        public static Grid<bool> GetBooleanPixels(Bitmap bmp)
+        {
+            Grid<bool> pixels = new Grid<bool>(bmp.Width, bmp.Height, false);
+
+            unsafe
+            {
+                BitmapData source = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
+                int bitsPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat) / 8;
+                int pixelHeight = source.Height;
+                int byteWidth = source.Width * bitsPerPixel; // is == width
+                byte* ptr = (byte*)source.Scan0;
+
+                // NOTE: a for statement, all done at once.
+                Parallel.For(0, pixelHeight, y =>
+                {
+                    byte* row = ptr + (y * source.Stride);
+                    for (int x = 0; x < byteWidth; x += bitsPerPixel)
+                        pixels.SetValue(row[x + 3] > 0, x / bitsPerPixel, y);
+                });
+
+                bmp.UnlockBits(source);
+            }
+
+            return pixels;
         }
 
         /// <summary>
@@ -393,7 +481,7 @@ namespace Orikivo.Drawing
             return offset < 0 ? Math.Abs(origin + offset) : 0;
         }
 
-        public static Rectangle ClampRectangle(System.Drawing.Point origin, Size size, System.Drawing.Point offset, Size innerSize)
+        public static Rectangle ClampRectangle(Point origin, Size size, Point offset, Size innerSize)
         {
             
                                                                                          // origin = (0, 0)

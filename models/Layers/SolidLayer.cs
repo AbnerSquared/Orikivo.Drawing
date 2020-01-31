@@ -11,6 +11,6 @@ namespace Orikivo.Drawing
         public int Height { get; set; }
 
         protected override Bitmap GetBaseImage()
-            => GraphicsUtils.CreateBitmap(Color, Width, Height);
+            => GraphicsUtils.CreateRgbBitmap(Color, Width, Height);
     }
 }

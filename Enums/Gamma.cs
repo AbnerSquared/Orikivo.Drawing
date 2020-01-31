@@ -1,12 +1,12 @@
 ﻿namespace Orikivo.Drawing
 {
     /// <summary>
-    /// Represents a level of brightness for a <see cref="GammaColorMap"/>.
+    /// Represents a level of brightness for a <see cref="GammaPalette"/>.
     /// </summary>
     public enum Gamma
     {
         /// <summary>
-        /// The darkest <see cref="GammaColor"/> within a <see cref="GammaColorMap"/>.
+        /// The darkest <see cref="GammaColor"/> within a <see cref="GammaPalette"/>.
         /// </summary>
         Min = 0,
 
@@ -23,7 +23,7 @@
         Brighter = 6,
 
         /// <summary>
-        /// The brightest <see cref="GammaColor"/> within a <see cref="GammaColorMap"/>.
+        /// The brightest <see cref="GammaColor"/> within a <see cref="GammaPalette"/>.
         /// </summary>
         Max = 7
     }

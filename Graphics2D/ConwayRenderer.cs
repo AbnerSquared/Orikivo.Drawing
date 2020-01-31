@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Orikivo.Drawing.Graphics2D
 {
@@ -15,6 +16,13 @@ namespace Orikivo.Drawing.Graphics2D
             DecayTickLength = decayTickLength;
             Pattern = CurrentGeneration = pattern;
         }
+
+        private GammaColor? _activeColor;
+
+        /// <summary>
+        /// The <see cref="GammaColor"/> that represents a currently living <see cref="ConwayCell"/>. If left empty, it will default to <see cref="LiveColor"/>.
+        /// </summary>
+        public GammaColor ActiveColor { get => _activeColor.GetValueOrDefault(LiveColor); set => _activeColor = value; }
 
         /// <summary>
         /// The <see cref="GammaColor"/> that represents a living <see cref="ConwayCell"/>.
@@ -47,7 +55,7 @@ namespace Orikivo.Drawing.Graphics2D
         {
             Grid<ConwayCell> pattern = new Grid<ConwayCell>(width, height);
 
-            pattern.ForEachValue(delegate
+            pattern.SetEachValue(delegate
             {
                 return ConwayCell.FromRandom();
             });
@@ -126,7 +134,7 @@ namespace Orikivo.Drawing.Graphics2D
                 if (lastNeighbors == 3 && !last.Active)
                     next.Toggle();
 
-                next.LastActiveTick = CurrentTick;
+                next.LastActiveTick = CurrentTick + 1;
             }
             else if (last.Active)
                 next.Toggle();
@@ -138,36 +146,35 @@ namespace Orikivo.Drawing.Graphics2D
         {
             Grid<ConwayCell> next = new Grid<ConwayCell>(Width, Height);
 
-            next.ForEachValue(delegate(int x, int y)
-            {
-                return GetNextCell(x, y);
-            });
+            next.SetEachValue((int x, int y) => GetNextCell(x, y));
 
             return next;
         }
 
-        public List<Grid<GammaColor>> Run(long ticks)
+        public List<Grid<Color>> Run(long ticks)
         {
-            List<Grid<GammaColor>> frames = new List<Grid<GammaColor>>();
+            List<Grid<Color>> frames = new List<Grid<Color>>();
 
             if (CurrentTick == 0)
-                frames.Add(GetPixels());
-
-            for (int t = 0; t < ticks; t++)
             {
-                CurrentTick++;
+                frames.Add(GetPixels());
+            }
+
+            for (int t = CurrentTick == 0 ? 1 : 0; t < ticks; t++)
+            {
                 CurrentGeneration = GetNextGeneration();
+                CurrentTick++;
                 frames.Add(GetPixels());
             }
 
             return frames;
         }
 
-        public Grid<GammaColor> GetPixels()
+        public Grid<Color> GetPixels()
         {
-            Grid<GammaColor> grid = new Grid<GammaColor>(Width, Height);
+            Grid<Color> grid = new Grid<Color>(Width, Height);
 
-            grid.ForEachValue(delegate (int x, int y)
+            grid.SetEachValue(delegate (int x, int y)
             {
                 ConwayCell cell = CurrentGeneration[x, y];
 
@@ -175,18 +182,22 @@ namespace Orikivo.Drawing.Graphics2D
                 {
                     return DeadColor;
                 }
-                else if (DecayTickLength.HasValue)
+                else if (cell.LastActiveTick == CurrentTick)
                 {
-                    long sinceLastActive = CurrentTick - cell.LastActiveTick;
+                    return ActiveColor;
+                }
+                else if (DecayTickLength.GetValueOrDefault(0) > 0)
+                {
+                    long lastActive = CurrentTick - cell.LastActiveTick;
 
-                    float decay = RangeF.Percent.Convert(0, DecayTickLength.Value,
-                        RangeF.Clamp(0, DecayTickLength.Value, sinceLastActive));
+                    float remainder = 1.0f - RangeF.Convert(0, DecayTickLength.Value + 1, 0.0f, 1.0f,
+                                   RangeF.Clamp(0, DecayTickLength.Value + 1, lastActive));
 
-                    return sinceLastActive == 0 ? LiveColor : GammaColor.Merge(LiveColor, DeadColor, decay);
+                    return GammaColor.Merge(DeadColor, LiveColor, remainder);
                 }
                 else
                 {
-                    return cell.Active ? LiveColor : DeadColor;
+                    return cell.LastActiveTick == CurrentTick ? LiveColor : DeadColor;
                 }
             });
 

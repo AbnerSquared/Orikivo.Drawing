@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using Point = System.Drawing.Point;
 
 namespace Orikivo.Drawing.Graphics3D
 {
     public class WireframeRasterizer : Rasterizer
     {
-        public override Grid<GammaColor> Render(in Model model, Camera camera, GammaPen pen)
+        public override Grid<Color> Render(in Model model, Camera camera, GammaPen pen)
         {
-            Grid<GammaColor> frame = camera.GetScreen();
+            Grid<Color> frame = camera.GetScreen();
 
             for (int i = 0; i < model.Mesh.Triangles.Count; i++)
             {

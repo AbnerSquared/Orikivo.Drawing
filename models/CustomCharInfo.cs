@@ -31,6 +31,7 @@ namespace Orikivo.Drawing
         [JsonProperty("offset_y")]
         public int? OffsetY { get; }
 
+        // TODO: Instead of making the point null, simply set a default.
         [JsonIgnore]
         public Point? Offset => (OffsetX.HasValue || OffsetY.HasValue) ?
             (Point?) new Point(OffsetX.GetValueOrDefault(0), OffsetY.GetValueOrDefault(0))

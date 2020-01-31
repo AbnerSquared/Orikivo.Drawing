@@ -322,15 +322,15 @@ namespace Orikivo.Drawing
         }
 
         /// <summary>
-        /// Returns the index of the closest matching index of the specified <see cref="GammaColor"/> from a <see cref="GammaColorMap"/>.
+        /// Returns the index of the closest matching index of the specified <see cref="GammaColor"/> from a <see cref="GammaPalette"/>.
         /// </summary>
-        public static int ClosestMatchAt(GammaColor value, GammaColorMap colors)
+        public static int ClosestMatchAt(GammaColor value, GammaPalette colors)
             => ClosestMatchAt(value, colors.Values);
 
         /// <summary>
-        /// Returns the closest matching <see cref="GammaColor"/> for the specified value from a <see cref="GammaColorMap"/>.
+        /// Returns the closest matching <see cref="GammaColor"/> for the specified value from a <see cref="GammaPalette"/>.
         /// </summary>
-        public static GammaColor ClosestMatch(GammaColor value, GammaColorMap colors)
+        public static GammaColor ClosestMatch(GammaColor value, GammaPalette colors)
             => ClosestMatch(value, colors.Values);
 
         [JsonConstructor]

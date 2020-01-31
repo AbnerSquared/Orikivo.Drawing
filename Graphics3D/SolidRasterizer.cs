@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Point = System.Drawing.Point;
 
 namespace Orikivo.Drawing.Graphics3D
@@ -7,9 +8,9 @@ namespace Orikivo.Drawing.Graphics3D
     // TODO: Finish solid rasterization.
     public class SolidRasterizer : Rasterizer
     {
-        public override Grid<GammaColor> Render(in Model model, Camera camera, GammaPen pen)
+        public override Grid<Color> Render(in Model model, Camera camera, GammaPen pen)
         {
-            Grid<GammaColor> frame = camera.GetScreen();
+            Grid<Color> frame = camera.GetScreen();
 
             for (int i = 0; i < model.Mesh.Triangles.Count; i++)
             {
@@ -24,9 +25,9 @@ namespace Orikivo.Drawing.Graphics3D
                     Console.WriteLine($"[Visible] Dot Product ({dp})");
                     Triangle p = Project(t, camera.GetProjector(), camera.Width, camera.Height);
 
-                    List<System.Drawing.Point> visible = camera.GetVisible(p);
+                    List<Point> visible = camera.GetVisible(p);
 
-                    foreach (System.Drawing.Point v in visible)
+                    foreach (Point v in visible)
                         frame.SetValue(pen.Color, v.X, v.Y);
                 }
                 else

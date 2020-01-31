@@ -7,7 +7,7 @@ using System.Linq;
 namespace Orikivo.Drawing
 {
     /// <summary>
-    /// Represents a font to be used alongside <see cref="PixelGraphics"/> when drawing bodies of text.
+    /// Represents a font to be used alongside <see cref="GraphicsWriter"/> when drawing bodies of text.
     /// </summary>
     public class FontFace
     {
@@ -53,31 +53,39 @@ namespace Orikivo.Drawing
 
         public FontFace(FontFaceBuilder builder)
         {
-            Ppu = builder.Ppu;
+            CharWidth = builder.Width;
+            CharHeight = builder.Height;
             Padding = builder.Padding; // TODO: Set Default to Padding.Char at builder.
             Tag = GetTagValue(builder.IsMonospace, builder.IsUnicodeSupported);
             SheetUrls = builder.SheetUrls;
-            Empties = builder.Empties;
+            Whitespace = builder.Whitespace;
             Customs = builder.Customs;
             HideBadUnicode = builder.HideBadUnicode;
         }
 
         [JsonConstructor]
-        internal FontFace(Unit ppu, FontTag tag, Dictionary<int, string> sheetUrls,
-            Padding? padding = null, List<EmptyCharInfo> empties = null, List<CustomCharInfo> customs = null,
+        internal FontFace(int width, int height, FontTag tag, Dictionary<int, string> sheetUrls,
+            Padding? padding = null, List<WhiteSpaceInfo> empties = null, List<CustomCharInfo> customs = null,
             bool hideBadUnicode = false)
         {
-            Ppu = ppu;
+            CharWidth = width;
+            CharHeight = height;
             Padding = padding ?? Padding.Char;
             Tag = tag;
             SheetUrls = sheetUrls;
-            Empties = empties;
+            Whitespace = empties;
             Customs = customs;
             HideBadUnicode = hideBadUnicode;
         }
 
-        [JsonProperty("ppu")]
-        public Unit Ppu { get; }
+        [JsonProperty("width")]
+        public int CharWidth { get; }
+
+        [JsonProperty("height")]
+        public int CharHeight { get; }
+
+        [JsonIgnore]
+        public Size Ppu => new Size(CharWidth, CharHeight);
 
         /// <summary>
         /// The <see cref="Padding"/> that will be used with each <see cref="char"/> sprite value.
@@ -92,19 +100,13 @@ namespace Orikivo.Drawing
         public /*IReadOnly*/Dictionary<int, string> SheetUrls { get; }
 
         [JsonProperty("empties")]
-        public /*IReadOnly*/List<EmptyCharInfo> Empties { get; }
+        public /*IReadOnly*/List<WhiteSpaceInfo> Whitespace { get; }
 
         [JsonProperty("customs")]
         public /*IReadOnly*/List<CustomCharInfo> Customs { get; }
 
         [JsonProperty("hide_bad_unicode")]
         public bool HideBadUnicode { get; }
-
-        [JsonIgnore]
-        public int CharWidth => Ppu.Width;
-
-        [JsonIgnore]
-        public int CharHeight => Ppu.Height;
 
         [JsonIgnore]
         public bool IsUnicodeSupported => Tag.HasFlag(FontTag.UnicodeSupported);
@@ -118,10 +120,10 @@ namespace Orikivo.Drawing
         public int GetCharWidth(char c)
             => Customs?.FirstOrDefault(x => x.Chars.Contains(c))?.Width ?? CharWidth;
 
-        public EmptyCharInfo GetEmpty(char c)
-            => Empties.FirstOrDefault(x => x.Chars.Contains(c));
+        public WhiteSpaceInfo GetWhiteSpace(char c)
+            => Whitespace.FirstOrDefault(x => x.Chars.Contains(c));
 
-        public int GetEmptyWidth(char c)
-            => GetEmpty(c)?.Width ?? CharWidth;
+        public int GetWhiteSpaceWidth(char c)
+            => GetWhiteSpace(c)?.Width ?? CharWidth;
     }
 }

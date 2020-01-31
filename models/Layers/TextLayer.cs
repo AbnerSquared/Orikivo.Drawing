@@ -18,7 +18,7 @@ namespace Orikivo.Drawing
             PixelGraphicsConfig config = PixelGraphicsConfig.Default;
             config.CharMap = CharMap;
             config.Fonts.Add(Font);
-            using (PixelGraphics graphics = new PixelGraphics(config))
+            using (GraphicsWriter graphics = new GraphicsWriter(config))
             {
                 graphics.SetFont(Font);
                 return graphics.DrawString(Text, Color);

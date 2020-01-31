@@ -178,7 +178,6 @@ namespace Orikivo.Drawing
                 if (_leaf)
                 {
                     _paletteIndex = paletteIndex++;
-
                     palette.Add(Color.FromArgb(_red / _pixelCount, _green / _pixelCount, _blue / _pixelCount));
                 }
                 else

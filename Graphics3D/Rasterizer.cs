@@ -1,9 +1,11 @@
-﻿namespace Orikivo.Drawing.Graphics3D
+﻿using System.Drawing;
+
+namespace Orikivo.Drawing.Graphics3D
 {
     // this handles the drawing portion of the MeshRenderer
     public abstract class Rasterizer
     {
-        public abstract Grid<GammaColor> Render(in Model model, Camera camera, GammaPen pen);
+        public abstract Grid<Color> Render(in Model model, Camera camera, GammaPen pen);
 
         protected virtual Triangle Transform(in Triangle t, Transform transform)
         {

@@ -61,7 +61,7 @@ namespace Orikivo.Drawing
 
 
         /// <summary>
-        /// Returns the image at the specified index.
+        /// Returns the <see cref="Bitmap"/> at the specified index.
         /// </summary>
         public Bitmap GetSprite(int index) // # of total crops
         {
@@ -80,7 +80,7 @@ namespace Orikivo.Drawing
         }
 
         /// <summary>
-        /// Returns the image at the specified row and column.
+        /// Returns the <see cref="Bitmap"/> at the specified row and column.
         /// </summary>
         public Bitmap GetSprite(int row, int column)
         {
