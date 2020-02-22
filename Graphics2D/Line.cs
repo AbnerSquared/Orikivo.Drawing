@@ -5,7 +5,7 @@ namespace Orikivo.Drawing.Graphics2D
     /// <summary>
     /// Represents two <see cref="Vector2"/> points.
     /// </summary>
-    public class Line : Shape
+    public class Line
     {
         public Line(Vector2 a, float length, float angle)
         {
@@ -28,6 +28,7 @@ namespace Orikivo.Drawing.Graphics2D
             B = b;
         }
 
+        public Vector2[] Points { get; protected set; }
 
         public Vector2 A
         {

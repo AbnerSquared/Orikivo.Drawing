@@ -1,9 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MathF = System.MathF;
 
 namespace Orikivo.Drawing.Graphics2D
 {
+    public class Pen
+    {
+        public System.Drawing.Color Color { get; set; }
+        public float Size { get; set; }
+        public bool IsDown { get; set; }
+    }
+
+    public class Canvas
+    {
+        // individual pixels.
+        public Grid<System.Drawing.Color> Pixels { get; set; }
+        public int Width { get; }
+        public int Height { get; }
+        public Pen Pen { get; set; }
+
+        public void PenDown() { }
+        public void PenUp() { }
+        public void Clear() { }
+        
+        public void Stamp(System.Drawing.Image image)
+        { }
+    }
     /*
      * public const char ADD_OPERATOR = '+';
         public const char SUB_OPERATOR = '-';
@@ -37,7 +60,7 @@ namespace Orikivo.Drawing.Graphics2D
         // The answer has been solved.
      */
 
-    public static class Calculator
+    public static class Calc
     {
         // int, uint, byte, long, ulong, sbyte, short, ushort, double, float
 
@@ -59,6 +82,9 @@ namespace Orikivo.Drawing.Graphics2D
         {
             return x % 2; // 0 if even, 1 if odd
         }
+
+        public static int Parity(int x)
+            => x % 2;
 
     }
 
@@ -132,11 +158,38 @@ namespace Orikivo.Drawing.Graphics2D
             return sum;
         }
 
+        /// <summary>
+        /// Returns the arithmetic mean of the specified number set.
+        /// </summary>
+        /// <param name="set"></param>
+        /// <returns></returns>
+        public static float Average(IEnumerable<float> set)
+        {
+            return Sum(set) / set.Count();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="float"/> that is positioned in the middle of the specified number set.
+        /// </summary>
+        /// <param name="set"></param>
+        /// <returns></returns>
         public static float Median(IEnumerable<float> set)
         {
-            float median = Sum(set) / 2;
+            int length = set.Count();
+            float[] medianRange = new float[1 + Calc.Parity(length)];
+            int i = (int)Math.Floor((double)(length / 2));
+            if (Calc.Parity(length) == 0) // if it's even
+            {
+                
+                // when it's odd, you get the average of the two center values
+                return (set.ElementAt(i - 1) + set.ElementAt(i)) / 2;
+            }
+            else
+            {
+                return set.ElementAt(i);
+            }
 
-            return median;
+            // likewise if its odd, you can just return the value at the middle.
         }
 
         public static float Lerp(float a, float b, float amount)
@@ -168,6 +221,13 @@ namespace Orikivo.Drawing.Graphics2D
             return min;
         }
 
+        /// <summary>
+        /// Returns the largest positive <see cref="float"/> value from a specified collection.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="rest"></param>
+        /// <returns></returns>
         public static float Max(float a, float b, params float[] rest)
         {
             float max = MathF.Max(a, b);

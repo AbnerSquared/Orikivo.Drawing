@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace Orikivo.Drawing
 {
-    // GUIDE: https://css-tricks.com/8-digit-hex-codes/
     public class GammaPalette
     {
         public const int RequiredLength = 8;
@@ -54,10 +53,10 @@ namespace Orikivo.Drawing
         public GammaPalette(params GammaColor[] colors)
         {
             if (colors == null)
-                throw new ArgumentException("A GammaColorMap requires an existing list of colors.");
+                throw new ArgumentException("A GammaPalette requires an existing list of colors.");
 
             if (colors.Length != RequiredLength)
-                throw new ArgumentException("A GammaColorMap requires eight unique color values.");
+                throw new ArgumentException("A GammaPalette requires eight unique color values.");
 
             Values = colors;
         }

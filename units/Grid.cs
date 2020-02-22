@@ -1,11 +1,135 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Orikivo.Drawing.Graphics3D;
 
 namespace Orikivo.Drawing
 {
 
     public static class GridExtensions
     {
+        public static Grid<Vector3> Offset(this Grid<Vector3> grid, Vector3 v)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<Vector3> Offset(this Grid<Vector3> grid, float x, float y, float z)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<float> Add(this Grid<float> grid, float f)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<float> Subtract(this Grid<float> grid, float f)
+        {
+            throw new NotImplementedException();
+        }
+
+        // this multiplies as if they were matrices
+        public static Grid<float> Multiply(this Grid<float> grid, Grid<float> matrix)
+        {
+            throw new NotImplementedException();
+        }
+
+        // this multiplies all values on the grid by a specified value
+        public static Grid<float> Multiply(this Grid<float> grid, float f)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<float> Divide(this Grid<float> grid, float f)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<float> Pow(this Grid<float> grid, float f)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<float> Sqrt(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+        // this gets a grid from which the last grid is 
+        public static Grid<float> Cbrt(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+        // this adds up all float values on this grid.
+        public static float Sum(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+        // this sums all of the columns, and returns an array of all summed columns.
+        public static float[] SumColumns(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+        // this sums all of the rows, and returns an array of all summed rows
+        public static float[] SumRows(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+        // adds up all float values on a specified row.
+        public static float SumRow(this Grid<float> grid, int rowIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<float> SwapRow(this Grid<float> grid, int fromIndex, int toIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<float> Ceiling(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<float> Floor(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+        // removes all decimals
+        public static Grid<float> Truncate(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<float> Round(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+        // this transposes the grid specified.
+        public static Grid<float> Transpose(this Grid<float> grid)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public static Grid<Vector2> Offset(this Grid<Vector2> grid, Vector2 v)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static Grid<Vector2> Offset(this Grid<Vector2> grid, float x, float y)
+        {
+            throw new NotImplementedException();
+        }
+
         public static Grid<T?> GetRegionOrDefault<T>(this Grid<T> grid, int x, int y, int width, int height) where T : struct
         {
             Grid<T?> region = new Grid<T?>(width, height);
@@ -19,14 +143,78 @@ namespace Orikivo.Drawing
         }
     }
 
+    public class GridEnumerator<T> : IEnumerator<T>
+    {
+        private T[,] _values;
+        private int _position = -1;
+        private T _current;
+
+        public GridEnumerator(Grid<T> grid)
+        {
+            _values = grid.Values;
+            _current = default(T);
+        }
+
+        private T GetCurrent()
+        {
+            int x = _position;
+            int width = _values.GetLength(1);
+            int height = _values.GetLength(0);
+            int y = 0;
+
+            while (x >= width)
+            {
+                x -= width;
+                y++;
+            }
+
+            return _values[y, x];
+
+        }
+
+        public bool MoveNext()
+        {
+            if (++_position >= _values.Length)
+            {
+                return false;
+            }
+            else
+            {
+                _current = GetCurrent();
+            }
+
+            return true;
+        }
+
+        public void Reset()
+        {
+            _position = -1;
+        }
+
+        void IDisposable.Dispose() { }
+
+        public T Current
+        {
+            get => _current;
+        }
+
+        object IEnumerator.Current
+        {
+            get => Current;
+        }
+    }
+
     /// <summary>
-    /// A generic grid that allows for simple multi-dimensional manipulations.
+    /// Represents a generic grid that allows for complex multi-dimensional manipulation.
     /// </summary>
-    public class Grid<T>
+    public class Grid<T> : IEnumerable<T>
     {
         // TODO: Make numeric methods for Grid<int>, Grid<long>, Grid<float>, etc...
         // public static float Multiply(Grid<float> a, Grid<float> b);
 
+        /// <summary>
+        /// Constructs a new <see cref="Grid{T}"/> with a specified <see cref="System.Drawing.Size"/> and an optional default value.
+        /// </summary>
         public Grid(System.Drawing.Size size, T defaultValue = default)
         {
             Values = new T[size.Height, size.Width];
@@ -36,6 +224,9 @@ namespace Orikivo.Drawing
                 Clear(defaultValue);
         }
 
+        /// <summary>
+        /// Constructs a new <see cref="Grid{T}"/> with a specified width, height, and an optional default value.
+        /// </summary>
         public Grid(int width, int height, T defaultValue = default)
         {
             Values = new T[height, width];
@@ -46,11 +237,17 @@ namespace Orikivo.Drawing
                         Values[y, x] = defaultValue;
         }
 
+        /// <summary>
+        /// Constructs a new <see cref="Grid{T}"/> from a rectangluar <see cref="Array"/>.
+        /// </summary>
         public Grid(T[,] values)
         {
             Values = values;
         }
 
+        /// <summary>
+        /// Constructs a new <see cref="Grid{T}"/> from a jagged <see cref="Array"/>.
+        /// </summary>
         public Grid(T[][] values)
         {
             int height = values.GetUpperBound(0) + 1;
@@ -65,11 +262,40 @@ namespace Orikivo.Drawing
                             Values[y, x] = values[y][x];
         }
 
+        public IEnumerator<T> GetEnumerator()
+            => new GridEnumerator<T>(this);
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => new GridEnumerator<T>(this);
+
+        /// <summary>
+        /// Represents the raw elements of the <see cref="Grid{T}"/>.
+        /// </summary>
         public T[,] Values { get; } // TODO: Maybe add support for T[][] (Jagged Arrays?)
 
+        /// <summary>
+        /// Gets a 32-bit integer that represents the width of the <see cref="Grid{T}"/>.
+        /// </summary>
         public int Width => Values.GetLength(1);
+
+        /// <summary>
+        /// Gets a 32-bit integer that represents the height of the <see cref="Grid{T}"/>.
+        /// </summary>
         public int Height => Values.GetLength(0);
+
+        /// <summary>
+        /// Gets the total number of possible elements in the <see cref="Grid{T}"/>.
+        /// </summary>
+        public int Count => Values.Length;
+
         public System.Drawing.Size Size => new System.Drawing.Size(Values.GetLength(1), Values.GetLength(0));
+
+        // This returns a new grid with the exact same values as this one.
+        public Grid<T> Clone()
+        {
+            return new Grid<T>(Values);
+        }
+
 
         /// <summary>
         /// Sets the value of a grid coordinate by a specified <see cref="System.Drawing.Point"/>.
@@ -107,7 +333,7 @@ namespace Orikivo.Drawing
         }
 
         /// <summary>
-        /// Sets the value of a grid coordinate by a specified x and y position.
+        /// Sets the value of a grid coordinate by a specified x- and y-coordinate.
         /// </summary>
         public void SetValue(T value, int x, int y)
         {
@@ -193,6 +419,9 @@ namespace Orikivo.Drawing
 
         // boundaries matter in this one
 
+        public Grid<T> GetRegion(System.Drawing.Rectangle rectangle)
+            => GetRegion(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+
         public Grid<T> GetRegion(System.Drawing.Point point, System.Drawing.Size size)
             => GetRegion(point.X, point.Y, size.Width, size.Height);
 
@@ -220,8 +449,10 @@ namespace Orikivo.Drawing
                     SetValue(value, px + x, py + y);
         }
 
-        public void SetRegion(T[,] region, int x, int y, int width, int height)
+        public void SetRegion(T[,] region, int x, int y)
         {
+            int width = region.GetLength(1);
+            int height = region.GetLength(0);
             if (!Contains(x + width, y + height))
                 throw new ArgumentException("The region specified is out of bounds.");
 
@@ -230,11 +461,11 @@ namespace Orikivo.Drawing
                     SetValue(region[py, px], px + x, py + y);
         }
 
-        public void SetRegion(Grid<T> region, int x, int y, int width, int height)
-            => SetRegion(region.Values, x, y, width, height);
+        public void SetRegion(Grid<T> region, int x, int y)
+            => SetRegion(region.Values, x, y);
 
         /// <summary>
-        /// Clears the existing <see cref="Grid{T}"/> by a default specified value.
+        /// Clears the existing <see cref="Grid{T}"/> using a specified value.
         /// </summary>
         public void Clear(T value)
         {
@@ -250,6 +481,18 @@ namespace Orikivo.Drawing
                     Values[y, x] = action.Invoke(x, y);
         }
 
+        public void ForEachColumn(Action<T[]> action)
+        {
+            for (int x = 0; x < Width; x++)
+                action.Invoke(GetColumn(x));
+        }
+
+        public void ForEachRow(Action<T[]> action)
+        {
+            for (int y = 0; y < Height; y++)
+                action.Invoke(GetRow(y));
+        }
+
         public void ForEachValue(Action<int, int> action)
         {
             for (int y = 0; y < Height; y++)
@@ -261,6 +504,55 @@ namespace Orikivo.Drawing
         {
            get => Values[y, x];
            set => SetValue(value, x, y);
+        }
+
+
+        private T ValueAt(int i)
+        {
+            (int x, int y) = GetPosition(i);
+            return Values[y, x];
+        }
+
+        private (int x, int y) GetPosition(int i)
+        {
+            int x = i;
+            int y = 0;
+
+            while (x >= Width)
+            {
+                x -= Width;
+                y++;
+            }
+
+            return (x, y);
+        }
+
+        public T this[int i]
+        {
+            get => ValueAt(i);
+            set
+            {
+                (int x, int y) = GetPosition(i);
+                Values[y, x] = value;
+            }
+        }
+
+        // TODO: Since a Grid can be any size, it might be wise to handle extremely large grids.
+        /// <summary>
+        /// Returns a <see cref="string"/> that represents all elements in the <see cref="Grid{T}"/>.
+        /// </summary>
+        public override string ToString()
+        {
+            StringBuilder grid = new StringBuilder();
+
+            ForEachRow(delegate (T[] row)
+            {
+                grid.Append("[ ");
+                grid.AppendJoin(" ", row.Select(x => x.ToString()));
+                grid.AppendLine(" ]");
+            });
+
+            return grid.ToString();
         }
     }
 }

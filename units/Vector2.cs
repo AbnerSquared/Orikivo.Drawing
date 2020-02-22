@@ -1,10 +1,22 @@
-﻿namespace Orikivo.Drawing
+﻿using System;
+
+namespace Orikivo.Drawing
 {
     public struct Vector2
     {
         public static Vector2 Subtract(Vector2 a, Vector2 b)
         {
             return new Vector2(b.X - a.X, b.Y - a.Y);
+        }
+
+        public static Vector2 Multiply(Vector2 a, Vector2 b)
+        {
+            return new Vector2(a.X * b.X, a.Y * b.Y);
+        }
+
+        public static Vector2 Round(Vector2 v)
+        {
+            return new Vector2(MathF.Round(v.X), MathF.Round(v.Y));
         }
 
         public static Vector2 Zero = new Vector2(0.0f, 0.0f);
@@ -18,6 +30,18 @@
 
         public float X { get; set; }
         public float Y { get; set; }
+
+        public void Offset(Vector2 offset)
+        {
+            X += offset.X;
+            Y += offset.Y;
+        }
+
+        public void Offset(float x, float y)
+        {
+            X += x;
+            Y += y;
+        }
 
         public static Vector2 operator -(Vector2 a, Vector2 b)
             => Subtract(a, b);

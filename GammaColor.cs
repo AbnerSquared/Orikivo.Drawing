@@ -6,7 +6,14 @@ using System.Linq;
 
 namespace Orikivo.Drawing
 {
-    // an immutable color
+    /*
+       public static implicit operator DiscordColor(OriColor c)
+            => new DiscordColor((uint)c.Value << 8 >> 8);
+        public static explicit operator OriColor(DiscordColor c)
+            => new OriColor(c.RawValue);
+        public override string ToString()
+            => A < 255 ? string.Format("#{0:X8}", Value) : string.Format("#{0:X6}", MakeRgb(R, G, B));
+    */
 
     /// <summary>
     /// An immutable color object that supports multi-tone grouping and conversion formulas.
@@ -74,28 +81,28 @@ namespace Orikivo.Drawing
             return new GammaColor(r, g, b);
         }
 
-        public static GammaColor FromHsl(float h, float s, float l)
+        public static GammaColor FromHsl(AngleF hue, float s, float l)
         {
-            if (!RangeF.Degree.Contains(h) || !RangeF.Percent.All(s, l))
+            if (!RangeF.Percent.All(s, l))
                 throw new ArgumentException("One of the specified float values are out of range.");
 
             float c = (1 - Math.Abs((2 * l) - 1)) * s;
-            float x = c * (1 - Math.Abs((h / 60.00f) % 2 - 1));
+            float x = c * (1 - Math.Abs((hue.Degrees / 60.00f) % 2 - 1));
             float m = l - (c / 2);
 
-            return CreateFromChmx(c, h, m, x);
+            return CreateFromChmx(c, hue.Degrees, m, x);
         }
 
-        public static GammaColor FromHsv(float h, float s, float v)
+        public static GammaColor FromHsv(AngleF h, float s, float v)
         {
-            if (!RangeF.Degree.Contains(h) || !RangeF.Percent.All(s, v))
+            if (!RangeF.Percent.All(s, v))
                 throw new ArgumentException("One of the specified float values are out of range.");
 
             float c = v * s;
-            float x = c * (1 - Math.Abs((h / 60.00f) % 2 - 1));
+            float x = c * (1 - Math.Abs((h.Degrees / 60.00f) % 2 - 1));
             float m = v - c;
 
-            return CreateFromChmx(c, h, m, x);
+            return CreateFromChmx(c, h.Degrees, m, x);
 
         }
 
@@ -152,8 +159,6 @@ namespace Orikivo.Drawing
         /// <summary>
         /// Returns a <see cref="GammaColor"/> that is the conversion of the specified <see cref="GammaColor"/> to grayscale.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
         public static GammaColor Grayscale(GammaColor value)
         {
             byte rgb = (byte) Math.Floor(R_LUMINANCE * value.R + G_LUMINANCE * value.G + B_LUMINANCE * value.B);

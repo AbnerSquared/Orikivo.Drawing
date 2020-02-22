@@ -18,26 +18,26 @@ namespace Orikivo.Drawing
         private Image _image;
 
 
-        public GraphicsWriter(int width, int height, PixelFormat pixelFormat = PixelFormat.Format32bppArgb, PixelGraphicsConfig config = null)
+        public GraphicsWriter(int width, int height, PixelFormat pixelFormat = PixelFormat.Format32bppArgb, GraphicsConfig config = null)
         {
             _image = new Bitmap(width, height, pixelFormat);
-            config ??= PixelGraphicsConfig.Default;
+            config ??= GraphicsConfig.Default;
             CharMap = config.CharMap;
-            Palette = config.Colors;
+            Palette = config.Palette;
         }
-        public GraphicsWriter(Image image, PixelGraphicsConfig config = null)
+        public GraphicsWriter(Image image, GraphicsConfig config = null)
         {
             _image = image;
-            config ??= PixelGraphicsConfig.Default;
+            config ??= GraphicsConfig.Default;
             CharMap = config.CharMap;
-            Palette = config.Colors;   
+            Palette = config.Palette;   
         }
 
-        public GraphicsWriter(PixelGraphicsConfig config = null)
+        public GraphicsWriter(GraphicsConfig config = null)
         {
-            config ??= PixelGraphicsConfig.Default;
+            config ??= GraphicsConfig.Default;
             CharMap = config.CharMap;
-            Palette = config.Colors;
+            Palette = config.Palette;
         }
 
         private char[][][][] CharMap { get; }

@@ -15,7 +15,7 @@ namespace Orikivo.Drawing
 
         protected override Bitmap GetBaseImage()
         {
-            PixelGraphicsConfig config = PixelGraphicsConfig.Default;
+            GraphicsConfig config = GraphicsConfig.Default;
             config.CharMap = CharMap;
             config.Fonts.Add(Font);
             using (GraphicsWriter graphics = new GraphicsWriter(config))

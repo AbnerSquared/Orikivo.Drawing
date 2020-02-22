@@ -205,6 +205,51 @@ namespace Orikivo.Drawing
         public static Bitmap CreateRgbBitmap(Grid<GammaColor> colors)
             => CreateRgbBitmap(colors.Cast<Color>().Values);
 
+        // foreach bool set to true, set to the specified color
+        public static Bitmap CreateToggledBitmap(bool[,] indexes, Color trueColor, Color falseColor)
+        {
+            int width = indexes.GetLength(1);
+            int height = indexes.GetLength(0);
+
+            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            unsafe
+            {
+                BitmapData source = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, bmp.PixelFormat);
+                int bitsPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat) / 8;
+                int pixelHeight = source.Height;
+                int byteWidth = source.Width * bitsPerPixel; // is == width
+                byte* ptr = (byte*)source.Scan0;
+
+                // NOTE: a for statement, all done at once.
+                Parallel.For(0, pixelHeight, y =>
+                {
+                    byte* row = ptr + (y * source.Stride);
+                    for (int x = 0; x < byteWidth; x += bitsPerPixel)
+                    {
+                        Color color = indexes[y, x / bitsPerPixel] ? trueColor : falseColor;
+
+                        // A
+                        row[x + 3] = color.A;
+
+                        // R
+                        row[x + 2] = color.R;
+
+                        // G
+                        row[x + 1] = color.G;
+
+                        // B
+                        row[x] = color.B;
+                    }
+                });
+
+                bmp.UnlockBits(source);
+            }
+
+            return bmp;
+        }
+
+
         public static Bitmap CreateArgbBitmap(Color[,] colors)
         {
             int width = colors.GetLength(1);
@@ -247,7 +292,6 @@ namespace Orikivo.Drawing
 
             return bmp;
         }
-
 
         public static Bitmap CreateRgbBitmap(Color[,] colors)
         {

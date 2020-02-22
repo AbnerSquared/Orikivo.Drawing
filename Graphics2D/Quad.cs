@@ -1,6 +1,7 @@
 ﻿namespace Orikivo.Drawing.Graphics2D
 {
-    public class Quad : Shape
+
+    public class Quad : Polygon
     {
         public Quad(float x, float y, float width, float height)
         {
