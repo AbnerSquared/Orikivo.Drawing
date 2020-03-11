@@ -7,12 +7,12 @@ namespace Orikivo.Drawing
     // TODO: Replace MatrixF with Grid.
     public struct MatrixF
     {
-        public static MatrixF M4x4 => new MatrixF(4, 4);
+        public static readonly MatrixF M4x4 = new MatrixF(4, 4);
 
-        public static MatrixF CreateRotation2D(float angle)
+        public static MatrixF CreateRotation2D(AngleF angle)
         {
             MatrixF m = new MatrixF(2, 2);
-            float radians = Utils.Radians(angle);
+            float radians = angle.Radians;
 
             m[0, 0] = Cos(radians);
             m[0, 1] = -Sin(radians);
@@ -22,10 +22,10 @@ namespace Orikivo.Drawing
             return m;
         }
 
-        public static MatrixF CreateRotationX(float angle)
+        public static MatrixF CreateRotationX(AngleF angle)
         {
             MatrixF m = M4x4;
-            float radians = Utils.Radians(angle);
+            float radians = angle.Radians;
 
             m[0, 0] = 1.0f;
             m[1, 1] = Cos(radians);
@@ -37,10 +37,10 @@ namespace Orikivo.Drawing
             return m;
         }
 
-        public static MatrixF CreateRotationY(float angle)
+        public static MatrixF CreateRotationY(AngleF angle)
         {
             MatrixF m = M4x4;
-            float radians = Utils.Radians(angle);
+            float radians = angle.Radians;
 
             m[0, 0] = Cos(radians);
             m[0, 2] = Sin(radians);
@@ -53,10 +53,10 @@ namespace Orikivo.Drawing
 
         }
 
-        public static MatrixF CreateRotationZ(float angle)
+        public static MatrixF CreateRotationZ(AngleF angle)
         {
             MatrixF m = M4x4;
-            float radians = Utils.Radians(angle);
+            float radians = angle.Radians;
 
             m[0, 0] = Cos(radians);
             m[0, 1] = Sin(radians);
@@ -102,14 +102,13 @@ namespace Orikivo.Drawing
         }
 
         public float[,] Values { get; }
+
         public int Width => Values.GetLength(1);
+
         public int Height => Values.GetLength(0);
 
         public void SetValue(float value, int row, int column)
-        {
-            // TODO: Do Exception catching later.
-            Values[row, column] = value;
-        }
+            => Values[row, column] = value;
 
         public float[] GetRow(int y)
         {

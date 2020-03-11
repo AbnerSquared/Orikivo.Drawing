@@ -2,16 +2,12 @@
 
 namespace Orikivo.Drawing
 {
-    // TODO: Implement markers, which allow sub-ranges, returning the ends of where a value is in between markers.
-    
-    public struct Range
-    {
-        public static bool Contains(long min, long max, long value, bool inclusiveMin = true, bool inclusiveMax = true)
-            => (inclusiveMin ? value >= min : value > min) && (inclusiveMax ? value <= max : value < max);
-    }
-    
     public struct RangeF
     {
+        public static RangeF Percent => new RangeF(0.00f, 1.00f);
+        public static RangeF Normal => new RangeF(-1.00f, 1.00f);
+        public static RangeF Degree => new RangeF(0.00f, 360.00f, true, false);
+
         public static float Convert(RangeF from, RangeF to, float value)
             => Convert(from.Min, from.Max, to.Min, to.Max, value);
 
@@ -23,29 +19,31 @@ namespace Orikivo.Drawing
             if (from == 0)
                 return toMin;
 
-            return (((value - fromMin) * to) / from) + toMin;
+            return ((value - fromMin) * to / from) + toMin;
         }
 
         /// <summary>
         /// Flattens the <see cref="RangeF"/> as whole numbers.
         /// </summary>
         public static RangeF Truncate(RangeF range)
-        {
-            return new RangeF(MathF.Truncate(range.Min), MathF.Truncate(range.Max), range.InclusiveMin, range.InclusiveMax);
-        }
+            => new RangeF(MathF.Truncate(range.Min),
+                MathF.Truncate(range.Max),
+                range.InclusiveMin,
+                range.InclusiveMax);
 
         public static float Clamp(RangeF range, float value)
             => Clamp(range.Min, range.Max, value);
 
         public static float Clamp(float min, float max, float value)
-        {
-            return value > max ? max : value < min ? min : value;
-        }
+            => value > max
+            ? max
+            : value < min
+            ? min
+            : value;
 
         public static bool Contains(float min, float max, float value, bool inclusiveMin = true, bool inclusiveMax = true)
-        {
-            return (inclusiveMin ? value >= min : value > min) && (inclusiveMax ? value <= max : value < max);
-        }
+            => (inclusiveMin ? value >= min : value > min)
+            && (inclusiveMax ? value <= max : value < max);
 
         public RangeF(float max, bool inclusiveMin = true, bool inclusiveMax = true)
         {
@@ -63,19 +61,13 @@ namespace Orikivo.Drawing
             InclusiveMax = inclusiveMax;
         }
 
-        public static RangeF Percent => new RangeF(0.00f, 1.00f);
-        public static RangeF Normal => new RangeF(-1.00f, 1.00f);
-        public static RangeF Degree => new RangeF(0.00f, 360.00f, true, false);
-        // hours in a day : 0, 24
-        // offset : -14, 14
-
         /// <summary>
-        /// The lower bound of the current <see cref="RangeF"/>.
+        /// Gets the lower bound of the current <see cref="RangeF"/>.
         /// </summary>
         public float LowerBound => InclusiveMin ? Min : (Min - float.Epsilon);
 
         /// <summary>
-        /// The upper bound of the current <see cref="RangeF"/>.
+        /// Gets the upper bound of the current <see cref="RangeF"/>.
         /// </summary>
         public float UpperBound => InclusiveMax ? Max : (Max - float.Epsilon);
 

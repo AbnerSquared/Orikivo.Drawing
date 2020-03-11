@@ -2,9 +2,6 @@
 
 namespace Orikivo.Drawing
 {
-    /// <summary>
-    /// Represents extraneous whitespace that will surround a <see cref="System.Drawing.Image"/>.
-    /// </summary>
     public struct Padding
     {
         public static Padding Char => new Padding(right: 1);
@@ -37,15 +34,9 @@ namespace Orikivo.Drawing
         [JsonProperty("bottom")]
         public int Bottom { get; set; }
 
-        /// <summary>
-        /// The literal width of the existing <see cref="Padding"/>.
-        /// </summary>
         [JsonIgnore]
         public int Width => Left + Right;
 
-        /// <summary>
-        /// The literal height of the existing <see cref="Padding"/>.
-        /// </summary>
         [JsonIgnore]
         public int Height => Top + Bottom;
     }

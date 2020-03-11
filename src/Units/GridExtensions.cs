@@ -5,6 +5,23 @@ namespace Orikivo.Drawing
 {
     public static class GridExtensions
     {
+        /// <summary>
+        /// Sets the value of a grid coordinate by a specified <see cref="System.Drawing.Point"/>.
+        /// </summary>
+        public static void SetValue<T>(this Grid<T> grid, T value, System.Drawing.Point p)
+            => grid.SetValue(value, p.X, p.Y);
+        public static T GetValue<T>(this Grid<T> grid, System.Drawing.Point p)
+             => grid.GetValue(p.X, p.Y);
+
+        public static Grid<T> GetRegion<T>(this Grid<T> grid, System.Drawing.Rectangle rectangle)
+            => grid.GetRegion(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+
+        public static Grid<T> GetRegion<T>(this Grid<T> grid, System.Drawing.Point point, System.Drawing.Size size)
+            => grid.GetRegion(point.X, point.Y, size.Width, size.Height);
+
+        public static Grid<T> GetPartialRegion<T>(this Grid<T> grid, System.Drawing.Point point, System.Drawing.Size size)
+            => grid.GetPartialRegion(point.X, point.Y, size.Width, size.Height);
+
         public static Grid<Vector3> Offset(this Grid<Vector3> grid, Vector3 v)
         {
             throw new NotImplementedException();

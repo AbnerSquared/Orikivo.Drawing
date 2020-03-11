@@ -1,22 +1,19 @@
-﻿using static System.MathF;
-
-namespace Orikivo.Drawing
+﻿namespace Orikivo.Drawing
 {
     public struct AngleF
     {
         public const float MinValue = 0.0f;
+
         public const float MaxValue = 360.0f - float.Epsilon;
 
-        private static float Wrap(float f)
-            => f % 360.0f;
-
-        public static readonly AngleF Zero = 0.0f;
-
         public static readonly AngleF Up = 90.0f;
+
         public static readonly AngleF Down = 270.0f;
+
         public static readonly AngleF Left = 180.0f;
+
         public static readonly AngleF Right = 0.0f;
-        
+
         public AngleF(float f)
         {
             _degrees = Wrap(f);
@@ -24,8 +21,11 @@ namespace Orikivo.Drawing
 
         private float _degrees;
 
-        // the 0 to 1 variant
-        public float Normal => RangeF.Convert(RangeF.Degree, RangeF.Percent, Degrees);
+        public float Normal
+        {
+            get => RangeF.Convert(RangeF.Degree, RangeF.Percent, Degrees);
+            set => Degrees = RangeF.Convert(RangeF.Percent, RangeF.Degree, value);
+        }
 
         public float Degrees
         {
@@ -39,6 +39,9 @@ namespace Orikivo.Drawing
             set => Degrees = CalcF.Degrees(value);
         }
 
+        private static float Wrap(float f)
+            => f % 360.0f;
+
         public override bool Equals(object obj)
         {
             if (obj is AngleF)
@@ -50,7 +53,7 @@ namespace Orikivo.Drawing
         }
 
         public override int GetHashCode()
-            => (int) Floor(Degrees * 1000.0f); // 3 point precision is kept by multiplying it by 1000.0f;
+            => (int) System.MathF.Floor(Degrees * 1000.0f);
 
         public static bool operator ==(AngleF a, AngleF b)
             => a.Degrees == b.Degrees;
@@ -116,7 +119,7 @@ namespace Orikivo.Drawing
             => a.Degrees;
 
         public static implicit operator int(AngleF a)
-            => (int) Floor(a.Degrees);
+            => (int) System.MathF.Floor(a.Degrees);
 
         public static implicit operator AngleF(float f)
             => new AngleF(f);

@@ -6,7 +6,6 @@ using System.Text;
 
 namespace Orikivo.Drawing
 {
-    // TODO: Separate obscure methods into a GridExtensions file.
     /// <summary>
     /// Represents a grid that allows for complex generic matrix manipulation.
     /// </summary>
@@ -18,10 +17,7 @@ namespace Orikivo.Drawing
         public Grid(System.Drawing.Size size, T defaultValue = default)
         {
             Values = new T[size.Height, size.Width];
-
-            // TODO: Figure out why this no longer works.
-            //if (defaultValue != default)
-                Clear(defaultValue);
+            Clear(defaultValue);
         }
 
         /// <summary>
@@ -31,10 +27,9 @@ namespace Orikivo.Drawing
         {
             Values = new T[height, width];
 
-            //if (defaultValue != default)
-                for (int y = 0; y < height; y++)
-                    for (int x = 0; x < width; x++)
-                        Values[y, x] = defaultValue;
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                    Values[y, x] = defaultValue;
         }
 
         /// <summary>
@@ -63,16 +58,10 @@ namespace Orikivo.Drawing
                             Values[y, x] = values[y][x];
         }
 
-        public IEnumerator<T> GetEnumerator()
-            => new Enumerator<T>(this);
-
-        IEnumerator IEnumerable.GetEnumerator()
-            => new Enumerator<T>(this);
-
         /// <summary>
         /// Represents the raw elements of the <see cref="Grid{T}"/>.
         /// </summary>
-        public T[,] Values { get; } // TODO: Maybe add support for T[][] (Jagged Arrays?)
+        public T[,] Values { get; }
 
         /// <summary>
         /// Gets a 32-bit integer that represents the width of the <see cref="Grid{T}"/>.
@@ -91,20 +80,18 @@ namespace Orikivo.Drawing
 
         public System.Drawing.Size Size => new System.Drawing.Size(Values.GetLength(1), Values.GetLength(0));
 
+        public IEnumerator<T> GetEnumerator()
+            => new Enumerator<T>(this);
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => new Enumerator<T>(this);
+
         /// <summary>
         /// Initializes a new <see cref="Grid{T}"/> with this <see cref="Grid{T}"/>'s current values.
         /// </summary>
         public Grid<T> Clone()
             => new Grid<T>(Values);
 
-        // TODO: Separate into an extension.
-        /// <summary>
-        /// Sets the value of a grid coordinate by a specified <see cref="System.Drawing.Point"/>.
-        /// </summary>
-        public void SetValue(T value, System.Drawing.Point p)
-            => SetValue(value, p.X, p.Y);
-
-        
         public Grid<TResult> ConvertAll<TResult>()
         {
             // TODO: Change how this method is handled, as it currently doesn't work as intended.
@@ -174,17 +161,22 @@ namespace Orikivo.Drawing
                 Values[y, x] = value;
         }
 
-        // NOTE: This method can set a row, but if the row is incomplete, it will retain its previous value
         public void SetRow(int y, IEnumerable<T> values)
         {
             if (values.Count() > Width)
                 throw new ArgumentException("The row specified must be less than or equal to the width of the grid.");
+
+            for (int x = 0; x < Width; x++)
+                Values[y, x] = values.ElementAtOrDefault(x);
         }
 
         public void SetColumn(int x, IEnumerable<T> values)
         {
             if (values.Count() > Height)
                 throw new ArgumentException("The column specified must be less than or equal to the height of the grid.");
+
+            for (int y = 0; y < Height; y++)
+                Values[y, x] = values.ElementAtOrDefault(y);
         }
 
         /// <summary>
@@ -206,9 +198,6 @@ namespace Orikivo.Drawing
                 Values[y, x] = value;
         }
 
-        public T GetValue(System.Drawing.Point p)
-            => GetValue(p.X, p.Y);
-
         public T GetValue(int x, int y)
         {
             return Values[y, x];
@@ -225,33 +214,14 @@ namespace Orikivo.Drawing
             return true;
         }
 
-        // a region from which it doesn't matter if the portion of the area is available or not
-        // boundaries dont matter in this one
-        public Grid<T> GetPartialRegion(System.Drawing.Point point, System.Drawing.Size size)
-            => GetPartialRegion(point.X, point.Y, size.Width, size.Height);
-
-        public Grid<T> GetPartialRegion(int x, int y, int width, int height)
+        public T ValueAt(int i)
         {
-            Grid<T> region = new Grid<T>(width, height);
-
-            for (int py = 0; py < height; py++)
-                for (int px = 0; px < width; px++)
-                    if (Contains(px + x, py + y))
-                        region.SetValue(GetValue(x + px, y + py), px, py);
-
-            return region;
+            (int x, int y) = GetPosition(i);
+            return Values[y, x];
         }
 
         public bool Contains(int x, int y)
             => (x >= 0 && x < Width && y >= 0 && y < Height);
-
-        // boundaries matter in this one
-
-        public Grid<T> GetRegion(System.Drawing.Rectangle rectangle)
-            => GetRegion(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
-
-        public Grid<T> GetRegion(System.Drawing.Point point, System.Drawing.Size size)
-            => GetRegion(point.X, point.Y, size.Width, size.Height);
 
         public Grid<T> GetRegion(int x, int y, int width, int height)
         {
@@ -263,6 +233,18 @@ namespace Orikivo.Drawing
             for (int py = 0; py < height; py++)
                 for (int px = 0; px < width; px++)
                     region.SetValue(GetValue(x + px, y + py), px, py);
+
+            return region;
+        }
+
+        public Grid<T> GetPartialRegion(int x, int y, int width, int height)
+        {
+            Grid<T> region = new Grid<T>(width, height);
+
+            for (int py = 0; py < height; py++)
+                for (int px = 0; px < width; px++)
+                    if (Contains(px + x, py + y))
+                        region.SetValue(GetValue(x + px, y + py), px, py);
 
             return region;
         }
@@ -328,19 +310,6 @@ namespace Orikivo.Drawing
                     action.Invoke(x, y);
         }
 
-        public T this[int x, int y]
-        {
-           get => Values[y, x];
-           set => SetValue(value, x, y);
-        }
-
-
-        private T ValueAt(int i)
-        {
-            (int x, int y) = GetPosition(i);
-            return Values[y, x];
-        }
-
         private (int x, int y) GetPosition(int i)
         {
             int x = i;
@@ -353,6 +322,12 @@ namespace Orikivo.Drawing
             }
 
             return (x, y);
+        }
+
+        public T this[int x, int y]
+        {
+           get => Values[y, x];
+           set => SetValue(value, x, y);
         }
 
         public T this[int i]
@@ -392,7 +367,7 @@ namespace Orikivo.Drawing
             public Enumerator(Grid<T> grid)
             {
                 _values = grid.Values;
-                _current = default(T);
+                _current = default;
             }
 
             private T GetCurrent()
