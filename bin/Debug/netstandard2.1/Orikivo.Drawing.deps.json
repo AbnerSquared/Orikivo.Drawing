@@ -1,0 +1,74 @@
+{
+  "runtimeTarget": {
+    "name": ".NETStandard,Version=v2.1/",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETStandard,Version=v2.1": {},
+    ".NETStandard,Version=v2.1/": {
+      "Orikivo.Drawing/1.0.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "12.0.3-beta1",
+          "System.Drawing.Common": "4.6.0-preview7.19362.9",
+          "System.Numerics.Vectors": "4.5.0"
+        },
+        "runtime": {
+          "Orikivo.Drawing.dll": {}
+        }
+      },
+      "Newtonsoft.Json/12.0.3-beta1": {
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "12.0.0.0",
+            "fileVersion": "12.0.3.23619"
+          }
+        }
+      },
+      "System.Drawing.Common/4.6.0-preview7.19362.9": {
+        "runtime": {
+          "lib/netstandard2.0/System.Drawing.Common.dll": {
+            "assemblyVersion": "4.0.1.0",
+            "fileVersion": "4.700.19.36209"
+          }
+        }
+      },
+      "System.Numerics.Vectors/4.5.0": {
+        "runtime": {
+          "lib/netstandard2.0/System.Numerics.Vectors.dll": {
+            "assemblyVersion": "4.1.4.0",
+            "fileVersion": "4.6.26515.6"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Orikivo.Drawing/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Newtonsoft.Json/12.0.3-beta1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dvGx3CT9tEs9LbgyIw9MZl+sLCFa6yx1NXLKaldRk+N9BgToJpCK2PUv8z2aNbLq6ljtLS93X5gamWxs8DhdRA==",
+      "path": "newtonsoft.json/12.0.3-beta1",
+      "hashPath": "newtonsoft.json.12.0.3-beta1.nupkg.sha512"
+    },
+    "System.Drawing.Common/4.6.0-preview7.19362.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-UD4ofG5DXka1I5W9JrpiJ0vQ7KF0qxPURsxhtKrxW63oM89bJiqL9pu9ZrNiAV6wMAoakCplRybscQyS2vSiHA==",
+      "path": "system.drawing.common/4.6.0-preview7.19362.9",
+      "hashPath": "system.drawing.common.4.6.0-preview7.19362.9.nupkg.sha512"
+    },
+    "System.Numerics.Vectors/4.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-QQTlPTl06J/iiDbJCiepZ4H//BVraReU4O4EoRw1U02H5TLUIT7xn3GnDp9AXPSlJUDyFs4uWjWafNX6WrAojQ==",
+      "path": "system.numerics.vectors/4.5.0",
+      "hashPath": "system.numerics.vectors.4.5.0.nupkg.sha512"
+    }
+  }
+}

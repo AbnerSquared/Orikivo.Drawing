@@ -1,0 +1,8 @@
+C:\dev\Orikivo.Poxel\bin\Debug\netstandard2.0\Orikivo.Poxel.deps.json
+C:\dev\Orikivo.Poxel\bin\Debug\netstandard2.0\Orikivo.Poxel.dll
+C:\dev\Orikivo.Poxel\bin\Debug\netstandard2.0\Orikivo.Poxel.pdb
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Poxel.AssemblyInfoInputs.cache
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Poxel.AssemblyInfo.cs
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Poxel.dll
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Poxel.pdb
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Poxel.csprojAssemblyReference.cache

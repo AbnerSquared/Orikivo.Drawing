@@ -1,0 +1,8 @@
+C:\dev\Orikivo.Drawing\bin\Debug\netstandard2.1\Orikivo.Drawing.deps.json
+C:\dev\Orikivo.Drawing\bin\Debug\netstandard2.1\Orikivo.Drawing.dll
+C:\dev\Orikivo.Drawing\bin\Debug\netstandard2.1\Orikivo.Drawing.pdb
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.1\Orikivo.Drawing.csprojAssemblyReference.cache
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.1\Orikivo.Drawing.AssemblyInfoInputs.cache
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.1\Orikivo.Drawing.AssemblyInfo.cs
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.1\Orikivo.Drawing.dll
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.1\Orikivo.Drawing.pdb

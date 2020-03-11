@@ -1,0 +1,16 @@
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Drawing.csprojAssemblyReference.cache
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Drawing.AssemblyInfoInputs.cache
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Drawing.AssemblyInfo.cs
+C:\dev\Orikivo.Poxel\bin\Debug\netstandard2.0\Orikivo.Drawing.deps.json
+C:\dev\Orikivo.Poxel\bin\Debug\netstandard2.0\Orikivo.Drawing.dll
+C:\dev\Orikivo.Poxel\bin\Debug\netstandard2.0\Orikivo.Drawing.pdb
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Drawing.dll
+C:\dev\Orikivo.Poxel\obj\Debug\netstandard2.0\Orikivo.Drawing.pdb
+C:\dev\Orikivo.Drawing\bin\Debug\netstandard2.0\Orikivo.Drawing.deps.json
+C:\dev\Orikivo.Drawing\bin\Debug\netstandard2.0\Orikivo.Drawing.dll
+C:\dev\Orikivo.Drawing\bin\Debug\netstandard2.0\Orikivo.Drawing.pdb
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.0\Orikivo.Drawing.csprojAssemblyReference.cache
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.0\Orikivo.Drawing.AssemblyInfoInputs.cache
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.0\Orikivo.Drawing.AssemblyInfo.cs
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.0\Orikivo.Drawing.dll
+C:\dev\Orikivo.Drawing\obj\Debug\netstandard2.0\Orikivo.Drawing.pdb
