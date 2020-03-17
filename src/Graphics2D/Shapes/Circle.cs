@@ -10,7 +10,7 @@ namespace Orikivo.Drawing.Graphics2D
             Origin = new Vector2(x, y);
 
             if (radius <= 0.0f)
-                throw new System.ArgumentException("The radius specified must be greater than 0.");
+                throw new ArgumentException("The radius specified must be greater than 0.");
 
 
             Radius = radius;
@@ -21,7 +21,7 @@ namespace Orikivo.Drawing.Graphics2D
             Origin = origin;
 
             if (radius <= 0.0f)
-                throw new System.ArgumentException("The radius specified must be greater than 0.");
+                throw new ArgumentException("The radius specified must be greater than 0.");
 
 
             Radius = radius;
@@ -44,8 +44,23 @@ namespace Orikivo.Drawing.Graphics2D
             return CalcF.Pi * MathF.Pow(Radius, 2);
         }
 
+        public RegionF GetBoundingBox()
+        {
+            float xMin = Origin.X - Radius;
+            float yMin = Origin.Y - Radius;
+            float xMax = Origin.X + Radius;
+            float yMax = Origin.Y + Radius;
+
+            return new RegionF(xMin, yMin, xMax, yMax);
+        }
+
         public float GetArcLength(AngleF angle)
             => angle.Radians * Radius;
+
+        public Vector2 GetParametricPoint(AngleF angle)
+            => new Vector2(
+                Origin.X + Radius * MathF.Cos(angle.Radians),
+                Origin.Y + Radius * MathF.Sin(angle.Radians));
 
         // This focuses on a portion of a circle (a segement from an angle), and checks
         // if it's within that portion.
@@ -55,6 +70,46 @@ namespace Orikivo.Drawing.Graphics2D
         public bool SectorContains(AngleF angle, AngleF arc, Vector2 p)
         {
             throw new NotImplementedException();
+        }
+
+        public bool Intersects(Circle circle)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Intersects(RegionF region)
+        {
+            var quad = new Quad(region);
+
+            return region.Contains(Origin)
+            || Intersects(quad.Left)
+            || Intersects(quad.Top)
+            || Intersects(quad.Right)
+            || Intersects(quad.Bottom);
+        }
+
+        public bool Intersects(Line line)
+        {
+            Line perpendicular = line.GetPerpendicular(Origin);
+
+            if (0 <= perpendicular.GetLength() && perpendicular.GetLength() <= Radius)
+                return true;
+
+            return Contains(line.A) || Contains(line.B);
+        }
+
+        public float DistanceFromOrigin(Vector2 p)
+            => CalcF.Distance(Origin, p);
+
+        public float DistanceFrom(Vector2 p)
+        {
+            float fromOrigin = CalcF.Distance(Origin, p);
+
+            if (fromOrigin >= Radius)
+                fromOrigin -= Radius;
+
+            return fromOrigin;
+
         }
 
         public void Offset(Vector2 offset)

@@ -22,6 +22,9 @@ namespace Orikivo.Drawing.Animating
 
         public bool Disposed { get; protected set; } = false;
 
+        public void AddLayer(TimelineLayer layer)
+            => _layers.Add(layer);
+
         public MemoryStream Compile(TimeSpan frameLength, Quality quality = Quality.Bpp8)
         {
             if (Disposed)

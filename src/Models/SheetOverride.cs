@@ -11,7 +11,11 @@ namespace Orikivo.Drawing
         public static SheetOverride Empty = new SheetOverride(0, 0);
 
         [JsonConstructor]
-        public SheetOverride(int row, int column, int? offsetX = null, int? offsetY = null, int? width = null,
+        public SheetOverride(int row,
+            int column,
+            int? offsetX = null,
+            int? offsetY = null,
+            int? width = null,
             int? height = null)
         {
             Row = row;

@@ -1,5 +1,8 @@
 ﻿namespace Orikivo.Drawing
 {
+    /// <summary>
+    /// Represents a mathematical degree.
+    /// </summary>
     public struct AngleF
     {
         public const float MinValue = 0.0f;
@@ -90,6 +93,9 @@
 
         public static AngleF operator -(float a, AngleF b)
             => Wrap(a) - b.Degrees;
+
+        public static AngleF operator -(AngleF a)
+            => -a.Degrees;
 
         public static AngleF operator *(AngleF a, float b)
         {

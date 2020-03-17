@@ -18,6 +18,12 @@ namespace Orikivo.Drawing
         public const float E = 2.71828175f;
         public const float Degree = Pi / 180.0f;
 
+        public static Vector2 PolarToParametric(float magnitude, AngleF direction)
+        {
+            return new Vector2(magnitude * MathF.Cos(direction.Radians),
+                magnitude * MathF.Sin(direction.Radians));
+        }
+
         public static float Hypotenuse(float opposite, float adjacent)
             => MathF.Sqrt((opposite * opposite) + (adjacent * adjacent));
 
@@ -160,11 +166,14 @@ namespace Orikivo.Drawing
             return max;
         }
 
+        public static float Distance(float x1, float y1, float x2, float y2)
+        {
+            return MathF.Sqrt(MathF.Pow(x2 - x1, 2) + MathF.Pow(y2 - y1, 2));
+        }
+
         public static float Distance(Vector2 a, Vector2 b)
         {
-            float dist = MathF.Sqrt(MathF.Pow(b.X - a.X, 2) + MathF.Pow(b.Y - a.Y, 2));
-
-            return dist;
+            return MathF.Sqrt(MathF.Pow(b.X - a.X, 2) + MathF.Pow(b.Y - a.Y, 2));
         }
 
         public static float Slope(Vector2 a, Vector2 b)
