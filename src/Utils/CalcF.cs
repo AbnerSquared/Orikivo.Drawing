@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MathF = System.MathF;
 
 namespace Orikivo.Drawing
 {
-
     public static class CalcF
     {
-        // AlmostEquals(float a, float b, float difference)
-        // AlmostAllEquals(float a, float b, int maxMismatches)
-        // MuchGreater
-        // MuchLesser
-
         public const float FLOAT_EPSILON = 1e-3f;
         public const float Pi = 3.14159274f;
         public const float E = 2.71828175f;
@@ -29,49 +22,34 @@ namespace Orikivo.Drawing
 
         public static IEnumerable<float> Ceiling(IEnumerable<float> set)
         {
-            List<float> ceilingSet = new List<float>();
-
             foreach (float f in set)
-                ceilingSet.Add(MathF.Ceiling(f));
-
-            return ceilingSet;
+                yield return MathF.Ceiling(f);
         }
 
         public static IEnumerable<float> Floor(IEnumerable<float> set)
         {
-            List<float> floorSet = new List<float>();
-
             foreach (float f in set)
-                floorSet.Add(MathF.Floor(f));
-
-            return floorSet;
+                yield return MathF.Floor(f);
         }
 
         public static float Radians(float degrees)
-        {
-            return degrees * (Pi / 180.0f);
-        }
+            => degrees * (Pi / 180.0f);
 
         public static float Degrees(float radians)
-        {
-            return radians * (180.0f / Pi);
-        }
+            => radians * (180.0f / Pi);
 
         public static bool MuchGreater(float a, float b, float minDifference = FLOAT_EPSILON)
-        {
-            return a - minDifference > b;
-        }
+            => a - minDifference > b;
 
         public static bool AlmostGreater(float a, float b, float minDifference = FLOAT_EPSILON)
-        {
-            return a > b - minDifference;
-        }
+            => a > b - minDifference;
 
         public static bool AlmostEquals(float a, float b, float minDifference = FLOAT_EPSILON)
-        {
-            return MathF.Abs(a - b) <= minDifference;
-        }
+            => MathF.Abs(a - b) <= minDifference;
 
+        /// <summary>
+        /// Returns the sum of all numbers in a set.
+        /// </summary>
         public static float Sum(IEnumerable<float> set)
         {
             float sum = 0;
@@ -83,45 +61,42 @@ namespace Orikivo.Drawing
         }
 
         /// <summary>
-        /// Returns the arithmetic mean of the specified number set.
+        /// Returns the absolute sum of all numbers in a set.
         /// </summary>
-        /// <param name="set"></param>
-        /// <returns></returns>
-        public static float Average(IEnumerable<float> set)
+        public static float SumAbs(IEnumerable<float> set)
         {
-            return Sum(set) / set.Count();
+            float sumAbs = 0;
+
+            foreach (float f in set)
+                sumAbs += MathF.Abs(f);
+
+            return sumAbs;
         }
 
         /// <summary>
-        /// Returns the <see cref="float"/> that is positioned in the middle of the specified number set.
+        /// Returns the arithmetic mean of a number set.
         /// </summary>
-        /// <param name="set"></param>
-        /// <returns></returns>
+        public static float Average(IEnumerable<float> set)
+            => Sum(set) / set.Count();
+
+        /// <summary>
+        /// Returns the value that is specified in the middle of a number set.
+        /// </summary>
         public static float Median(IEnumerable<float> set)
         {
             int length = set.Count();
             int i = (int)Math.Floor((double)(length / 2));
-            if (Calc.Parity(length) == 0) // if it's even
-            {
-                
-                // when it's odd, you get the average of the two center values
-                return (set.ElementAt(i - 1) + set.ElementAt(i)) / 2;
-            }
-            else
-            {
-                return set.ElementAt(i);
-            }
 
-            // likewise if its odd, you can just return the value at the middle.
+            return Calc.Parity(length) == 0
+                ? (set.ElementAt(i - 1) + set.ElementAt(i)) / 2
+                : set.ElementAt(i);
         }
 
         /// <summary>
         /// Interpolates between two values by the specified amount.
         /// </summary>
         public static float Lerp(float a, float b, float amount)
-        {
-            return  a + (amount * (b - a));
-        }
+            => a + (amount * (b - a));
 
         /// <summary>
         /// Interpolates between two values using an enforced amount.
@@ -133,12 +108,10 @@ namespace Orikivo.Drawing
 
             return (1.0f - amount) * a + amount * b;
         }
-        
-        // linear interpolation
+
         public static Vector2 Lerp(Vector2 a, Vector2 b, float amount)
-        {
-            return new Vector2(Lerp(a.X, b.X, amount), Lerp(a.Y, b.Y, amount));
-        }
+            => new Vector2(Lerp(a.X, b.X, amount),
+                Lerp(a.Y, b.Y, amount));
 
         /// <summary>
         /// Returns the smallest <see cref="float"/> value from a specified collection.
@@ -166,24 +139,74 @@ namespace Orikivo.Drawing
             return max;
         }
 
-        public static float Distance(float x1, float y1, float x2, float y2)
+        public static Vector2 Rotate(Vector2 v, AngleF angle)
         {
-            return MathF.Sqrt(MathF.Pow(x2 - x1, 2) + MathF.Pow(y2 - y1, 2));
+            if (angle.Degrees == 0)
+                return v;
+
+            return Rotate(v.X, v.Y, angle);
         }
+
+        public static IEnumerable<Vector2> RotateAround(Vector2 axis, IEnumerable<Vector2> set, AngleF angle)
+        {
+            foreach (Vector2 v in set)
+                yield return RotateAround(axis, v, angle);
+        }
+
+        public static Vector2 RotateAround(Vector2 axis, Vector2 v, AngleF angle)
+        {
+            if (angle.Degrees == 0)
+                return v;
+
+            return RotateAroundAxis(axis.X, axis.Y, v.X, v.Y, angle);
+        }
+
+        public static Vector2 RotateAroundAxis(float ax, float ay, float vx, float vy, AngleF angle)
+        {
+            float x = vx - ax;
+            float y = vy - ay;
+            Vector2 rotated = Rotate(x, y, angle);
+
+            return new Vector2(ax + rotated.X, ay + rotated.Y);
+        }
+
+        public static Vector2 Rotate(float x, float y, AngleF angle)
+        {
+            return angle.Degrees switch
+            {
+                0 => new Vector2(x, y),
+                90 => Rotate90(x, y),
+                180 => Rotate180(x, y),
+                270 => Rotate270(x, y),
+                _ => new Vector2(
+                    x * MathF.Cos(angle.Radians) - (y * MathF.Sin(angle.Radians)),
+                    x * MathF.Sin(angle.Radians) + (y * MathF.Cos(angle.Radians)))
+            };
+        }
+
+        private static Vector2 Rotate90(float x, float y)
+            => new Vector2(y, -x);
+
+        private static Vector2 Rotate180(float x, float y)
+            => new Vector2(-x, -y);
+
+        private static Vector2 Rotate270(float x, float y)
+            => new Vector2(-y, x);
 
         public static float Distance(Vector2 a, Vector2 b)
-        {
-            return MathF.Sqrt(MathF.Pow(b.X - a.X, 2) + MathF.Pow(b.Y - a.Y, 2));
-        }
+            => Distance(a.X, a.Y, b.X, b.Y);
+
+        public static float Distance(float x1, float y1, float x2, float y2)
+            => MathF.Sqrt(MathF.Pow(x2 - x1, 2) + MathF.Pow(y2 - y1, 2));
 
         public static float Slope(Vector2 a, Vector2 b)
+            => Slope(a.X, a.Y, b.X, b.Y);
+
+        public static float Slope(float x1, float y1, float x2, float y2)
         {
-            float dy = b.Y - a.Y;
-            float dx = b.X - a.X;
-
-            float m = dy / dx;
-
-            return m;
+            float dy = y2 - y1;
+            float dx = x2 - x1;
+            return dy / dx;
         }
 
         // TODO: Optimize by simply comparing values instead of using a Dictionary.

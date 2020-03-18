@@ -3,6 +3,7 @@ using System;
 
 namespace Orikivo.Drawing
 {
+    // TODO: Implement operators.
     public struct Vector2
     {
         public static Vector2 Zero = new Vector2(0);
@@ -137,6 +138,15 @@ namespace Orikivo.Drawing
             Y += y;
         }
 
+        public void OffsetRotate(AngleF offset)
+        {
+            X = X * MathF.Cos(offset.Radians) - (Y * MathF.Sin(offset.Radians));
+            Y = Y * MathF.Sin(offset.Radians) + (Y * MathF.Cos(offset.Radians));
+        }
+
+        public Vector2 GetNormal()
+            => CalcF.Rotate(X, Y, AngleF.Up);
+
         public float GetLength()
             => CalcF.Hypotenuse(X, Y);
 
@@ -145,7 +155,5 @@ namespace Orikivo.Drawing
 
         public AngleF GetDirection()
             => MathF.Atan(Y / X);
-
-        // TODO: Implement operators.
     }
 }

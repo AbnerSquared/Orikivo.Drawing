@@ -1,15 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Orikivo.Drawing.Graphics2D
 {
-    public class Fraction
-    {
-        public float Numerator { get; set; }
-        public float Denominator { get; set; }
-
-        public float Value => Numerator / Denominator;
-    }
-
     /// <summary>
     /// Represents two <see cref="Vector2"/> points.
     /// </summary>
@@ -80,21 +74,64 @@ namespace Orikivo.Drawing.Graphics2D
         public Line GetPerpendicular(Vector2 p)
         {
             float x = (p.Y - A.Y + (Slope * A.X) + (p.X / Slope)) / (Slope + (1 / Slope));
-
             return new Line(p, new Vector2(x, GetY(x)));
         }
 
-        
+        public void RotateAround(Vector2 p, AngleF angle)
+        {
+            A = CalcF.RotateAround(p, A, angle);
+            B = CalcF.RotateAround(p, B, angle);
+        }
 
-        public Vector2 GetIntersection(Line b)
+        public void RotateFromCenter(AngleF angle)
+        {
+            A = CalcF.Rotate(A, angle);
+            B = CalcF.Rotate(B, angle);
+        }
+
+        public void RotateFromA(AngleF angle)
+        {
+            A = CalcF.Rotate(A, angle);
+        }
+
+        public void RotateFromB(AngleF angle)
+        {
+            B = CalcF.Rotate(B, angle);
+        }
+
+        public Vector2? GetIntersection(Line b)
         {
             float x = GetIntersectX(b);
 
             if (GetY(x) != b.GetY(x))
-                throw new ArgumentException("The y values of each line do not match.");
+                return null;
 
             return new Vector2(x, GetY(x));
-            
+        }
+
+        public IEnumerable<Vector2> GetIntersections(Quad q)
+        {
+            foreach (Line line in q.GetLines())
+            {
+                if (Intersects(line))
+                    yield return GetIntersection(line).Value;
+            }
+        }
+
+        public Vector2? GetClosestIntersection(Quad q)
+            => GetClosestIntersectionFromPoint(A, q);
+
+        public Vector2? GetClosestIntersectionFromPoint(Vector2 p, Quad q)
+        {
+            var intersections = GetIntersections(q);
+
+            if (intersections?.Count() == 0)
+                return null;
+
+            if (intersections.Count() == 1)
+                return intersections.First();
+
+            return intersections.OrderBy(x => CalcF.Distance(p, x)).FirstOrDefault();
         }
 
         public bool IsHorizontal()
@@ -106,20 +143,17 @@ namespace Orikivo.Drawing.Graphics2D
         public bool Intersects(Line b)
         {
             float x = GetIntersectX(b);
-
             return GetY(x) == b.GetY(x);
         }
 
-        // true if this point equals any position on the line
         public bool Contains(Vector2 p)
             => IsHorizontal() ? p.Y == A.Y
             : IsVertical() ? p.X == A.X
             : p.Y == GetY(p.X);
 
-        // true if this point equals any position on the line AND the point is within the specified segment.
         public bool SegmentContains(Vector2 p)
-            => ((A.X <= p.X && p.X <= B.X  &&  A.Y <= p.Y && p.Y <= B.Y)
-            || (A.X >= p.X && p.X >= B.X  &&  A.Y >= p.Y && p.Y >= B.Y))
+            => ((RangeF.Contains(A.X, B.X, p.X) && RangeF.Contains(A.Y, B.Y, p.Y))
+            || (RangeF.Contains(B.X, A.X, p.X) && RangeF.Contains(B.Y, A.Y, p.Y)))
             && Contains(p);
 
         private float GetIntersectX(Line b)

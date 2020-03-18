@@ -5,17 +5,17 @@
     /// </summary>
     public struct AngleF
     {
-        public const float MinValue = 0.0f;
+        public const float MinValue = 0f;
 
-        public const float MaxValue = 360.0f - float.Epsilon;
+        public const float MaxValue = 360f - float.Epsilon;
 
-        public static readonly AngleF Up = 90.0f;
+        public static readonly AngleF Up = 90f;
 
-        public static readonly AngleF Down = 270.0f;
+        public static readonly AngleF Down = 270f;
 
-        public static readonly AngleF Left = 180.0f;
+        public static readonly AngleF Left = 180f;
 
-        public static readonly AngleF Right = 0.0f;
+        public static readonly AngleF Right = 0f;
 
         public AngleF(float f)
         {

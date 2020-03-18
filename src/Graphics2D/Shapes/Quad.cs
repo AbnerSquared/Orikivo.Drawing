@@ -1,18 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace Orikivo.Drawing.Graphics2D
 {
-    /// <summary>
-    /// Represents a mathematical Euclidian vector in n-dimensional space.
-    /// </summary>
-    public class VectorM
-    {
-        /// <summary>
-        /// Gets a 32-bit number that represents the dimension of the <see cref="VectorM"/>.
-        /// </summary>
-        public int Dimension { get; }
-    }
-
     public class Quad : Polygon
     {
         public Quad(float x, float y, float width, float height)
@@ -50,14 +39,6 @@ namespace Orikivo.Drawing.Graphics2D
             set => Points[0] = value;
         }
 
-        public Line Left => new Line(TopLeft, BottomLeft);
-
-        public Line Right => new Line(TopRight, BottomRight);
-
-        public Line Top => new Line(TopLeft, TopRight);
-
-        public Line Bottom => new Line(BottomRight, BottomLeft);
-
         public Vector2 TopRight
         {
             get => Points[1];
@@ -74,6 +55,29 @@ namespace Orikivo.Drawing.Graphics2D
         {
             get => Points[3];
             set => Points[3] = value;
+        }
+
+        public Line GetLeftLine()
+            => new Line(TopLeft, BottomLeft);
+
+        public Line GetRightLine()
+            => new Line(TopRight, BottomRight);
+
+        public Line GetTopLine()
+            => new Line(TopLeft, TopRight);
+
+        public Line GetBottomLine()
+            => new Line(BottomRight, BottomLeft);
+
+        public IEnumerable<Line> GetLines()
+        {
+            return new Line[]
+            {
+                GetLeftLine(),
+                GetRightLine(),
+                GetTopLine(),
+                GetBottomLine()
+            };
         }
 
         /// <summary>
