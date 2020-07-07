@@ -9,6 +9,9 @@ namespace Orikivo.Drawing.Encoding
     // TODO: Create a Decoder version of this class, which allows for the loading of GIF files, frame-by-frame.
     // This could most likely be utilized with Encoding/Raw, as the base classes contain what a GIF needs to decode.
 
+    // This class can be scrapped soon, as the Gif structure written is almost complete
+
+
     // NOTE: Referenced from the following GitHub projects:
     // https://github.com/DataDink/Bumpkit/blob/master/BumpKit/BumpKit/GifEncoder.cs
     /// <summary>
@@ -70,6 +73,7 @@ namespace Orikivo.Drawing.Encoding
             {
                 // This makes sure that the color palettes for the GIF are neatly stored.
                 EncodeUtils.CreateGifStream(image, source, Quality); 
+
                 if (_isFirstImage)
                 {
                     WriteHeader(source, image.Width, image.Height);

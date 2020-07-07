@@ -5,8 +5,13 @@
     /// </summary>
     public class Border
     {
+        // this is used to know what sides are drawn with this border.
+        public BorderAllow Allow { get; set; } = BorderAllow.All;
+
         public BorderEdge Edge { get; set; } = BorderEdge.Outside;
+
         public System.Drawing.Color Color { get; set; }
-        public int Width { get; set; }
+
+        public int Thickness { get; set; }
     }
 }
