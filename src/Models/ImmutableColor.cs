@@ -9,10 +9,10 @@ namespace Orikivo.Drawing
     /// <summary>
     /// Represents an immutable color object that supports multi-tone grouping and conversion formulas.
     /// </summary>
-    public struct GammaColor
+    public struct ImmutableColor
     {
-        public static GammaColor NeonRed = new GammaColor(0xF8427D);
-        public static GammaColor GammaGreen = new GammaColor(0x6EFAC8);
+        public static readonly ImmutableColor NeonRed = new ImmutableColor(0xF8427D);
+        public static readonly ImmutableColor GammaGreen = new ImmutableColor(0x6EFAC8);
 
         private const int A_SHIFT = 24;
         private const int R_SHIFT = 16;
@@ -31,15 +31,15 @@ namespace Orikivo.Drawing
             return (byte) MathF.Floor(255 * amount);
         }
 
-        public static GammaColor FromRange(float r, float g, float b, float a = 1.0f)
+        public static ImmutableColor FromRange(float r, float g, float b, float a = 1.0f)
         {
-            return new GammaColor(GetByteAmount(r),
+            return new ImmutableColor(GetByteAmount(r),
                                   GetByteAmount(g),
                                   GetByteAmount(b),
                                   GetByteAmount(a));
         }
 
-        public static GammaColor FromCmyk(float c, float m, float y, float k)
+        public static ImmutableColor FromCmyk(float c, float m, float y, float k)
         {
             RangeF bounds = RangeF.Percent;
 
@@ -50,7 +50,7 @@ namespace Orikivo.Drawing
             byte g = GetCmy(m, k);
             byte b = GetCmy(y, k);
 
-            return new GammaColor(r, g, b);
+            return new ImmutableColor(r, g, b);
         }
 
         private static byte GetCmy(float v, float k)
@@ -58,8 +58,8 @@ namespace Orikivo.Drawing
             return (byte) Math.Floor(255 * (1 - v) * (1 - k));
         }
 
-        // TODO: Make this method efficient.
-        public static GammaColor FromHex(string hex)
+        // TODO: Optimize this method
+        public static ImmutableColor FromHex(string hex)
         {
             hex = hex.TrimStart('#');
 
@@ -69,10 +69,10 @@ namespace Orikivo.Drawing
             byte g = byte.Parse(string.Format(format, hex[2] + hex[3]));
             byte b = byte.Parse(string.Format(format, hex[4] + hex[5]));
 
-            return new GammaColor(r, g, b);
+            return new ImmutableColor(r, g, b);
         }
 
-        public static GammaColor FromHsl(AngleF hue, float s, float l)
+        public static ImmutableColor FromHsl(AngleF hue, float s, float l)
         {
             if (!RangeF.Percent.All(s, l))
                 throw new ArgumentException("One of the specified float values are out of range.");
@@ -84,7 +84,7 @@ namespace Orikivo.Drawing
             return CreateFromChmx(c, hue.Degrees, m, x);
         }
 
-        public static GammaColor FromHsv(AngleF h, float s, float v)
+        public static ImmutableColor FromHsv(AngleF h, float s, float v)
         {
             if (!RangeF.Percent.All(s, v))
                 throw new ArgumentException("One of the specified float values are out of range.");
@@ -97,7 +97,7 @@ namespace Orikivo.Drawing
 
         }
 
-        private static GammaColor CreateFromChmx(float c, float h, float m,  float x)
+        private static ImmutableColor CreateFromChmx(float c, float h, float m, float x)
         {
             float rF = 0.00f;
             float gF = 0.00f;
@@ -144,20 +144,20 @@ namespace Orikivo.Drawing
             byte g = (byte)Math.Floor((gF + m) * 255);
             byte b = (byte)Math.Floor((bF + m) * 255);
 
-            return new GammaColor(r, g, b);
+            return new ImmutableColor(r, g, b);
         }
 
         /// <summary>
-        /// Returns a <see cref="GammaColor"/> that is the conversion of the specified <see cref="GammaColor"/> to grayscale.
+        /// Returns a <see cref="ImmutableColor"/> that is the conversion of the specified <see cref="ImmutableColor"/> to grayscale.
         /// </summary>
-        public static GammaColor Grayscale(GammaColor value)
+        public static ImmutableColor Grayscale(ImmutableColor value)
         {
             byte rgb = (byte) Math.Floor(R_LUMINANCE * value.R + G_LUMINANCE * value.G + B_LUMINANCE * value.B);
-            return new GammaColor(rgb, rgb, rgb);
+            return new ImmutableColor(rgb, rgb, rgb);
         }
 
         // Keep the opacity of the initial alpha
-        public static GammaColor Merge(GammaColor background, GammaColor foreground, float strength)
+        public static ImmutableColor Merge(ImmutableColor background, ImmutableColor foreground, float strength)
         {
             // TODO: Ensure range of 0.0 to 1.0
             if (strength > 1.00f || strength < 0.00f)
@@ -167,16 +167,16 @@ namespace Orikivo.Drawing
             byte g = GetMergeValue(background.G, foreground.G, strength);
             byte b = GetMergeValue(background.B, foreground.B, strength);
 
-            return new GammaColor(r, g, b);
+            return new ImmutableColor(r, g, b);
         }
 
         private static byte GetMergeValue(byte b, byte f, float strength)
             => (byte)Math.Floor((b * (1.00f - strength)) + (f * strength));
 
         /// <summary>
-        /// Gets the distance between two <see cref="GammaColor"/> values.
+        /// Gets the distance between two <see cref="ImmutableColor"/> values.
         /// </summary>
-        public static int Distance(GammaColor from, GammaColor to)
+        public static int Distance(ImmutableColor from, ImmutableColor to)
         {
             int r = to.R - from.R;
             int g = to.G - from.G;
@@ -185,27 +185,27 @@ namespace Orikivo.Drawing
         }
 
         /// <summary>
-        /// Returns the average <see cref="GammaColor"/> between two <see cref="GammaColor"/> values.
+        /// Returns the average <see cref="ImmutableColor"/> between two <see cref="ImmutableColor"/> values.
         /// </summary>
-        public static GammaColor Average(GammaColor a, GammaColor b)
+        public static ImmutableColor Average(ImmutableColor a, ImmutableColor b)
         {
             byte red = GetAverage(a.R, b.R);
             byte green = GetAverage(a.G, b.G);
             byte blue = GetAverage(a.B, b.B);
 
-            return new GammaColor(red, green, blue);
+            return new ImmutableColor(red, green, blue);
         }
 
         /// <summary>
-        /// Returns the average <see cref="GammaColor"/> from an array of <see cref="GammaColor"/> values.
+        /// Returns the average <see cref="ImmutableColor"/> from an array of <see cref="ImmutableColor"/> values.
         /// </summary>
-        public static GammaColor Average(GammaColor[] colors)
+        public static ImmutableColor Average(ImmutableColor[] colors)
         {
             byte r = GetAverage(colors.Select(x => x.R).Cast<int>());
             byte g = GetAverage(colors.Select(x => x.G).Cast<int>());
             byte b = GetAverage(colors.Select(x => x.B).Cast<int>());
 
-            return new GammaColor(r, g, b);
+            return new ImmutableColor(r, g, b);
         }
 
         private static byte GetAverage(IEnumerable<int> values)
@@ -224,77 +224,77 @@ namespace Orikivo.Drawing
             => GetAverage((IEnumerable<int>) values);
 
         /// <summary>
-        /// Returns a <see cref="GammaColor"/> from the difference between two <see cref="GammaColor"/> values.
+        /// Returns a <see cref="ImmutableColor"/> from the difference between two <see cref="ImmutableColor"/> values.
         /// </summary>
-        public static GammaColor Difference(GammaColor a, GammaColor b)
+        public static ImmutableColor Difference(ImmutableColor a, ImmutableColor b)
         {
             byte red = (byte) Math.Abs(a.R - b.R);
             byte green = (byte) Math.Abs(a.G - b.G);
             byte blue = (byte) Math.Abs(a.B - b.B);
 
-            return new GammaColor(red, green, blue);
+            return new ImmutableColor(red, green, blue);
         }
 
-        public static GammaColor Addition(GammaColor a, GammaColor b)
+        public static ImmutableColor Addition(ImmutableColor a, ImmutableColor b)
         {
             byte red = (byte) Math.Min(255, a.R + b.R);
             byte green = (byte) Math.Min(255, a.G + b.G);
             byte blue = (byte) Math.Min(255, a.B + b.B);
 
-            return new GammaColor(red, green, blue);
+            return new ImmutableColor(red, green, blue);
         }
 
-        public static GammaColor Subtract(GammaColor a, GammaColor b)
+        public static ImmutableColor Subtract(ImmutableColor a, ImmutableColor b)
         {
             byte red = (byte) Math.Min(0, a.R - b.R);;
             byte green = (byte) Math.Min(0, a.G - b.G);
             byte blue = (byte) Math.Min(0, a.B - b.B);
 
-            return new GammaColor(red, green, blue);
+            return new ImmutableColor(red, green, blue);
         }
 
-        public static GammaColor DarkenOnly(GammaColor a, GammaColor b)
+        public static ImmutableColor DarkenOnly(ImmutableColor a, ImmutableColor b)
         {
             byte red = Math.Min(a.R, b.R);
             byte green = Math.Min(a.G, b.G);
             byte blue = Math.Min(a.B, b.G);
 
-            return new GammaColor(red, green, blue);
+            return new ImmutableColor(red, green, blue);
         }
 
-        public static GammaColor LightenOnly(GammaColor a, GammaColor b)
+        public static ImmutableColor LightenOnly(ImmutableColor a, ImmutableColor b)
         {
             byte red = Math.Max(a.R, b.R);
             byte green = Math.Max(a.G, b.G);
             byte blue = Math.Max(a.B, b.B);
 
-            return new GammaColor(red, green, blue);
+            return new ImmutableColor(red, green, blue);
         }
 
         /// <summary>
-        /// Returns a <see cref="GammaColor"/> that is the opposite of the specified <see cref="GammaColor"/>.
+        /// Returns a <see cref="ImmutableColor"/> that is the opposite of the specified <see cref="ImmutableColor"/>.
         /// </summary>
-        public static GammaColor Negative(GammaColor value)
+        public static ImmutableColor Negative(ImmutableColor value)
         {
             byte r = (byte) (255 - value.R);
             byte g = (byte) (255 - value.G);
             byte b = (byte) (255 - value.B);
 
-            return new GammaColor(r, g, b);
+            return new ImmutableColor(r, g, b);
         }
 
         /// <summary>
-        /// Returns the closest matching <see cref="GammaColor"/> for the specified value from an array of <see cref="GammaColor"/> values.
+        /// Returns the closest matching <see cref="ImmutableColor"/> for the specified value from an array of <see cref="ImmutableColor"/> values.
         /// </summary>
-        public static GammaColor ClosestMatch(GammaColor value, GammaColor[] colors)
+        public static ImmutableColor ClosestMatch(ImmutableColor value, ImmutableColor[] colors)
         {
             return colors[ClosestMatchAt(value, colors)];
         }
 
         /// <summary>
-        /// Returns the index of the closest matching index of the specified <see cref="GammaColor"/> from an array of <see cref="GammaColor"/> values.
+        /// Returns the index of the closest matching index of the specified <see cref="ImmutableColor"/> from an array of <see cref="ImmutableColor"/> values.
         /// </summary>
-        public static int ClosestMatchAt(GammaColor value, GammaColor[] colors)
+        public static int ClosestMatchAt(ImmutableColor value, ImmutableColor[] colors)
         {
             int leastIndex = 0;
             int least = int.MaxValue;
@@ -317,76 +317,76 @@ namespace Orikivo.Drawing
         }
 
         /// <summary>
-        /// Returns the index of the closest matching index of the specified <see cref="GammaColor"/> from a <see cref="GammaPalette"/>.
+        /// Returns the index of the closest matching index of the specified <see cref="ImmutableColor"/> from a <see cref="GammaPalette"/>.
         /// </summary>
-        public static int ClosestMatchAt(GammaColor value, GammaPalette colors)
+        public static int ClosestMatchAt(ImmutableColor value, GammaPalette colors)
             => ClosestMatchAt(value, colors.Values);
 
         /// <summary>
-        /// Returns the closest matching <see cref="GammaColor"/> for the specified value from a <see cref="GammaPalette"/>.
+        /// Returns the closest matching <see cref="ImmutableColor"/> for the specified value from a <see cref="GammaPalette"/>.
         /// </summary>
-        public static GammaColor ClosestMatch(GammaColor value, GammaPalette colors)
+        public static ImmutableColor ClosestMatch(ImmutableColor value, GammaPalette colors)
             => ClosestMatch(value, colors.Values);
 
         /// <summary>
-        /// Constructs a new <see cref="GammaColor"/> from a raw RGBA value.
+        /// Constructs a new <see cref="ImmutableColor"/> from a raw RGBA value.
         /// </summary>
         [JsonConstructor]
-        internal GammaColor(long rgba)
+        internal ImmutableColor(long rgba)
         {
             Value = rgba;
         }
 
         /// <summary>
-        /// Constructs a new <see cref="GammaColor"/> from a raw RGB value.
+        /// Constructs a new <see cref="ImmutableColor"/> from a raw RGB value.
         /// </summary>
-        public GammaColor(uint rgb)
+        public ImmutableColor(uint rgb)
         {
             Value = MakeArgb(rgb, 255);
         }
 
         /// <summary>
-        /// Constructs a new <see cref="GammaColor"/> from the specified R, G, and B values.
+        /// Constructs a new <see cref="ImmutableColor"/> from the specified R, G, and B values.
         /// </summary>
-        public GammaColor(byte r, byte g, byte b)
+        public ImmutableColor(byte r, byte g, byte b)
         {
             Value = MakeArgb(r, g, b, 255);
         }
 
         /// <summary>
-        /// Constructs a new <see cref="GammaColor"/> from the specified R, G, B, and A values.
+        /// Constructs a new <see cref="ImmutableColor"/> from the specified R, G, B, and A values.
         /// </summary>
-        public GammaColor(byte r, byte g, byte b, byte a)
+        public ImmutableColor(byte r, byte g, byte b, byte a)
         {
             Value = MakeArgb(r, g, b, a);
         }
 
         /// <summary>
-        /// Gets the raw value of this <see cref="GammaColor"/>.
+        /// Gets the raw value of this <see cref="ImmutableColor"/>.
         /// </summary>
         [JsonProperty("raw_value")]
         public long Value { get; }
 
         /// <summary>
-        /// Gets the Alpha component of this <see cref="GammaColor"/>.
+        /// Gets the Alpha component of this <see cref="ImmutableColor"/>.
         /// </summary>
         [JsonIgnore]
         public byte A => (byte)(Value >> A_SHIFT);
 
         /// <summary>
-        /// Gets the Red component of this <see cref="GammaColor"/>.
+        /// Gets the Red component of this <see cref="ImmutableColor"/>.
         /// </summary>
         [JsonIgnore]
         public byte R => (byte)(Value >> R_SHIFT);
 
         /// <summary>
-        /// Gets the Green component of this <see cref="GammaColor"/>.
+        /// Gets the Green component of this <see cref="ImmutableColor"/>.
         /// </summary>
         [JsonIgnore]
         public byte G => (byte)(Value >> G_SHIFT);
 
         /// <summary>
-        /// Gets the Blue component of this <see cref="GammaColor"/>.
+        /// Gets the Blue component of this <see cref="ImmutableColor"/>.
         /// </summary>
         [JsonIgnore]
         public byte B => (byte)(Value >> B_SHIFT);
@@ -401,15 +401,15 @@ namespace Orikivo.Drawing
             => unchecked((uint)(r << R_SHIFT | g << G_SHIFT | b << B_SHIFT)) & 0xffffff;
 
         /// <summary>
-        /// Returns this <see cref="GammaColor"/> as a hexidecimal-formatted <see cref="string"/>.
+        /// Returns this <see cref="ImmutableColor"/> as a hexidecimal-formatted <see cref="string"/>.
         /// </summary>
         public override string ToString()
             => A < 255 ? string.Format("#{0:X8}", Value) : string.Format("#{0:X6}", MakeRgb(R, G, B));
 
-        public static implicit operator Color(GammaColor c)
+        public static implicit operator Color(ImmutableColor c)
             => Color.FromArgb((int)c.Value);
 
-        public static explicit operator GammaColor(Color c)
-            => new GammaColor((uint)c.ToArgb());
+        public static implicit operator ImmutableColor(Color c)
+            => new ImmutableColor((uint)c.ToArgb());
     }
 }

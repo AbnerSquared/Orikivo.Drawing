@@ -1,13 +1,13 @@
 ﻿namespace Orikivo.Drawing
 {
     /// <summary>
-    /// An indexable value that correlates with a <see cref="char[][][][]"/> grid collection.
+    /// Represents the index of a char that correlates with a character grid.
     /// </summary>
-    public struct CharMapIndex
+    public struct CharIndex
     {
-        internal static CharMapIndex FromResult(char c, int? i, int? x, int? y) => new CharMapIndex(c, i.HasValue && x.HasValue && y.HasValue, i, y, x);
+        internal static CharIndex FromResult(char c, int? i, int? x, int? y) => new CharIndex(c, i.HasValue && x.HasValue && y.HasValue, i, y, x);
 
-        private CharMapIndex(char c, bool isSuccess, int? page = null, int? row = null, int? column = null)
+        private CharIndex(char c, bool isSuccess, int? page = null, int? row = null, int? column = null)
         {
             Char = c;
             IsSuccess = isSuccess;
@@ -32,22 +32,22 @@
         public char Char { get; }
 
         /// <summary>
-        /// Returns true if the operation was a success; Otherwise, false.
+        /// Returns a <see cref="bool"/> that specifies if this search was successful.
         /// </summary>
         public bool IsSuccess { get; }
 
         /// <summary>
-        /// Represents the char[Page][][][] value.
+        /// Represents the page index.
         /// </summary>
         public int Page { get; }
 
         /// <summary>
-        /// Represents the char[][Row][][] value.
+        /// Represents the row index.
         /// </summary>
         public int Row { get; }
 
         /// <summary>
-        /// Represents the char[][][Column][] value.
+        /// Represents the column index.
         /// </summary>
         public int Column { get; }
 

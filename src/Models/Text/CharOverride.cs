@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace Orikivo.Drawing
 {
-    // allows you to set the custom width, height, and offset for a group of characters
+    // NOTE: allows you to set the custom width, height, and offset for a group of characters
     public class CharOverride
     {
         [JsonConstructor]

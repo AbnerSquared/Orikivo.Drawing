@@ -43,7 +43,7 @@ namespace Orikivo.Drawing
                     Formatting = Formatting.Indented
                 };
 
-                using (JsonReader reader = new JsonTextReader(stream))
+                using (var reader = new JsonTextReader(stream))
                 {
                     FontFace font = JsonSerializer.Create(settings).Deserialize<FontFace>(reader);
                     return font ?? (default);
@@ -99,7 +99,8 @@ namespace Orikivo.Drawing
         [JsonProperty("empties")]
         public /*IReadOnly*/List<WhiteSpaceInfo> Whitespace { get; }
 
-        [JsonProperty("customs")] // TODO: rename all assets to use overrides instead
+        // TODO: rename all assets to use overrides instead
+        [JsonProperty("customs")]
         public /*IReadOnly*/List<CharOverride> Overrides { get; }
 
         [JsonProperty("hide_bad_unicode")]

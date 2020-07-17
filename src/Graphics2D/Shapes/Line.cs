@@ -50,6 +50,7 @@ namespace Orikivo.Drawing.Graphics2D
         }
 
         public float DeltaX => B.X - A.X;
+
         public float DeltaY => B.Y - A.X;
 
         public float Slope => DeltaY / DeltaX;
@@ -120,6 +121,9 @@ namespace Orikivo.Drawing.Graphics2D
 
         public Vector2? GetClosestIntersection(Quad q)
             => GetClosestIntersectionFromPoint(A, q);
+
+        public Vector2? GetClosestIntersection(RegionF region)
+            => GetClosestIntersectionFromPoint(A, new Quad(region));
 
         public Vector2? GetClosestIntersectionFromPoint(Vector2 p, Quad q)
         {

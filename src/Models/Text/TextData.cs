@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Orikivo.Drawing
 {
+    /// <summary>
+    /// Contains all of the required information for rendering a body of text.
+    /// </summary>
     internal class TextData : IDisposable
     {
         internal TextData(string text, Padding padding, int width, int height, IEnumerable<CharData> chars)

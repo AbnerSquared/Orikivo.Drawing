@@ -11,12 +11,9 @@ namespace Orikivo.Drawing.Graphics2D
             Pixels = new Grid<Color>(width, height, backgroundColor);
         }
 
-        // individual pixels.
-        // a grid containing all pixels that can be drawn.
         public Grid<Color> Pixels { get; set; }
 
-
-        // the currently active pen.
+        // NOTE: This is the active pen used to draw when active
         public Pen Pen { get; set; }
 
         public void PenDown()
@@ -34,13 +31,20 @@ namespace Orikivo.Drawing.Graphics2D
             Pixels.Clear(color);
         }
 
-        public void Stamp(Image image)
-        { }
+        public void Stamp(Grid<Color> pixels, int x, int y)
+        {
+            Pixels.SetRegion(pixels, x, y);
+        }
 
-        // https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
-        // https://www.geeksforgeeks.org/mid-point-circle-drawing-algorithm/
-        // draws a circle using the Midpoint Circle Algorithm
+        // TODO: Implement Canvas.Stamp(Image)
+        //public void Stamp(Image image) { }
 
+        public void DrawCircle(Point origin, int radius, Color color)
+            => DrawCircle(origin.X, origin.Y, radius, color);
+
+        // REF: https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+        // REF: https://www.geeksforgeeks.org/mid-point-circle-drawing-algorithm/
+        // NOTE: This method draws a circle using the Midpoint Circle Algorithm
         public void DrawCircle(int originX, int originY, int radius, Color color)
         {
             var pixels = GetCirclePixels(originX, originY, radius);
@@ -62,6 +66,9 @@ namespace Orikivo.Drawing.Graphics2D
                     Pixels.SetValue(color, pixel.X, pixel.Y);
             }
         }
+
+        public void DrawLine(Point a, Point b, Color color)
+            => DrawLine(a.X, a.Y, b.X, b.Y, color);
 
         public void DrawRectangle(int x, int y, int width, int height, Color color)
         {
@@ -85,7 +92,16 @@ namespace Orikivo.Drawing.Graphics2D
             }
 
         }
+
+        public void DrawRectangle(Point point, Size size, Color color)
+            => DrawRectangle(point.X, point.Y, size.Width, size.Height, color);
         
+        public void DrawPoint(int x, int y, Color color)
+        {
+            if (Pixels.Contains(x, y))
+                Pixels.SetValue(color, x, y);
+        }
+
         public List<Point> GetCirclePixels(int originX, int originY, int radius)
         {
             var pixels = new List<Point>();
@@ -129,7 +145,7 @@ namespace Orikivo.Drawing.Graphics2D
                     break;
                 }
 
-                //adding all points, with its reflections in other octants
+                // NOTE: This is adding all points with their reflections in other octants
                 pixels.Add(new Point(x + originX, y + originY));
                 pixels.Add(new Point(-x + originX, y + originY));
                 pixels.Add(new Point(x + originX, -y + originY));
@@ -147,8 +163,9 @@ namespace Orikivo.Drawing.Graphics2D
             return pixels;
         }
 
-        // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-        // http://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C.23
+        // REF: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+        // REF: http://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C.23
+        // NOTE: This draws a line using Bresenham's Line algorithm
         public List<Point> GetLinePixels(int ax, int ay, int bx, int by)
         {
             var pixels = new List<Point>();
@@ -161,7 +178,6 @@ namespace Orikivo.Drawing.Graphics2D
 
             int err = (dx > dy ? dx : -dy) / 2;
             int e2;
-
 
             for(;;)
             {
@@ -188,6 +204,11 @@ namespace Orikivo.Drawing.Graphics2D
             }
 
             return pixels;
+        }
+
+        public Bitmap Build()
+        {
+            return ImageEditor.CreateArgbBitmap(Pixels.Values);
         }
     }
 }

@@ -1,5 +1,8 @@
-﻿namespace Orikivo.Drawing
+﻿using System;
+
+namespace Orikivo.Drawing
 {
+    // NOTE: RectangleF
     /// <summary>
     /// Represents a rectangular floating-point region.
     /// </summary>
@@ -10,6 +13,12 @@
             && v <= y
             && u < x + width
             && v < y + height;
+
+        public static RegionF Floor(RegionF region)
+            => Floor(region.X, region.Y, region.Width, region.Height);
+
+        public static RegionF Floor(float x, float y, float width, float height)
+            => new RegionF(MathF.Floor(x), MathF.Floor(y), MathF.Floor(width), MathF.Floor(height));
 
         public RegionF(float x, float y, float width, float height)
         {
@@ -31,7 +40,7 @@
 
         public Vector2 Position => new Vector2(X, Y);
 
-        public Vector2 Origin => new Vector2(X + (Width / 2), Y + (Height / 2));
+        public Vector2 Midpoint => new Vector2(X + (Width / 2), Y + (Height / 2));
 
         public float Left => X;
 
